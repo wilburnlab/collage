@@ -3,13 +3,14 @@ Functions for model evaluation (loss)
 '''
 
 # Libraries
+import math
 import numpy as np
 import torch
 import torch.nn as nn
 
 
 
-class Relative_Codon_Likelihood( nn.Module ):
+class Weighted_Likelihood( nn.Module ):
     def __init__( self, ): #log_codon_freq : np.ndarray, ):
         super().__init__()
 
@@ -19,7 +20,7 @@ class Relative_Codon_Likelihood( nn.Module ):
 
         self.nllloss = nn.NLLLoss( reduction='none', )
 
-    def forward( self, logprob_by_codon, obs_codons ):
+    def forward( self, logprob_by_codon, obs_codons, weight ):
         '''
         logprob_by_codons: tensor of size (batch_size,seq_len,codons)
         obs_codons: tensor of size (batch_size,seq_len)
@@ -27,13 +28,23 @@ class Relative_Codon_Likelihood( nn.Module ):
 
         neg_logLs = self.nllloss( logprob_by_codon.transpose( 1, -1, ),
                                   obs_codons ) # Should be size ( B, L )
-        #marginal = self.prior( obs_codons ).reshape( neg_logLs.shape )
+        mask = neg_logLs != 0.0
+        loss = torch.sum( weight * neg_logLs ) / torch.sum( weight * mask )
 
-        neg_posterior = neg_logLs #+ marginal
-        posterior_mask = neg_posterior != 0.0
-        loss = torch.sum( neg_posterior ) / torch.sum( posterior_mask )
         return loss
         
+
+def calc_accuracy( targets : torch.Tensor,
+                   log_probabilities : torch.Tensor ) -> float:
+    '''
+    For a given set of targets and a probability matrix, calculate the accuracy
+    '''
+
+    max_logLs, max_idx_class = log_probabilities.max( dim=-1, ) # [ B, n_classes ] -> [ B ]
+    n = targets.flatten().size( 0 )
+    accuracy = torch.sum( max_idx_class == targets ).item() / n
+    return accuracy
+
 
 
 

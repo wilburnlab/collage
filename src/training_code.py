@@ -10,6 +10,10 @@ import torch
 
 from collage.src.utils import timer
 from collage.src.tensorize import records_to_batches
+from collage.src.eval_functions import Weighted_Likelihood, calc_accuracy
+from collage.src.tensorize import split_train_test_data
+from collage.src.model import initialize_CoLLAGE_model
+from collage.src.settings import training_parameters
 
 
 
@@ -20,7 +24,7 @@ def train_loop( model,
                 output_name : str, 
                 start_time : float, 
                 epochs : int = 20, 
-                epochs_to_2x_batch : int = 50,
+                epochs_to_2x_length : int = 50,
                 device : str ='cpu', 
                 train_batch_size : int = 6, 
                 initial_seq_len : int = 30, 
@@ -50,8 +54,9 @@ def train_loop( model,
                 model.eval()
 
             total_loss = 0
+            total_accuracy = 0
 
-            seq_len = int( initial_seq_len * math.pow( 2.0, epoch / epochs_to_2x_batch ) )
+            seq_len = int( initial_seq_len * math.pow( 2.0, epoch / epochs_to_2x_length ) )
             seq_len = min( [ seq_len, 500, ] )
 
             batches = records_to_batches( data_by_mode[ mode ],
@@ -64,10 +69,12 @@ def train_loop( model,
             total_n = 0
             counter = 0
             for i, batch in enumerate( batches ):
-                prot, cds = [ x.to( device ) for x in batch ] #, sp, null
-                n = prot.size(0)
+                prot, cds, weight, gene = [ x.to( device ) for x in batch ] #, sp, null
+                targets = cds[ :, 1: ]
+                n = prot.flatten().size(0)
                 pred = model( prot, cds[:,:-1], ) #sp )
-                loss = loss_fx( pred, cds[ :, 1: ] )
+                loss = loss_fx( pred, targets, weight )
+                accuracy = calc_accuracy( targets, pred, )
                 
                 if mode == 'train':
                     optimizer.zero_grad()
@@ -75,14 +82,18 @@ def train_loop( model,
                     optimizer.step()
                     if scheduler:
                         scheduler.step()
+
+                
                 total_loss += loss.detach().item() * n
+                total_accuracy += accuracy * n
                 total_n += n
                 counter += n
             score = total_loss / total_n
+            mode_accuracy = total_accuracy / total_n
             log_file = open( output_name+'.log', 'a' )
             log_file.write( '\t' + mode.capitalize() + ' score: ' + format( score, '.5f' ) + '\n'  ) 
             log_file.close()
-            print( mode.capitalize() + format( score, '.4f' ).rjust(8) )
+            print( mode.capitalize() + format( score, '.4f' ).rjust(8) + ' (' + format( mode_accuracy, '.2%' ) + ')' )
             if mode == 'test':
                 if score < best_score:
                     print( 'New best weights! Copying and saving model to\n\t' + output_name + '.pt' )
@@ -92,8 +103,38 @@ def train_loop( model,
                     epochs_wo_improv = 0
                 else:
                     print( 'Did not improve, best performance was epoch ' + 
-                           str(best_epoch) + ' (' + format(best_score,'.4f') + ')' )
+                           str(best_epoch+1) + ' (' + format(best_score,'.4f') + ')' )
         print( 'Runtime: ' + timer( start_time ) + '\n' )
     return score
+
+
+
+def train_collage( output_name, training_data, test_frac, random_seed, start_time, 
+                   device = None, start_model = None, ):
+
+    data_by_mode = split_train_test_data( training_data, 
+                                          test_frac, 
+                                          random_seed )
+    loss_fx = Weighted_Likelihood(  )
+    model = initialize_CoLLAGE_model( start_model, 
+                                      gpu = device == 'cuda', )
+    optimizer = training_parameters[ 'optimizer' ]( model.parameters(),
+                                                    lr = training_parameters[ 'learning_rate' ], )
+
+    train_loop( model = model,
+                optimizer = optimizer, 
+                loss_fx = loss_fx, 
+                data_by_mode = data_by_mode, 
+                output_name = output_name, 
+                start_time = start_time, 
+                epochs = training_parameters[ 'n_epochs' ], 
+                epochs_to_2x_length = training_parameters[ 'epochs_to_2x_length' ],
+                device = device, 
+                train_batch_size = training_parameters[ 'train_batch_size' ], 
+                initial_seq_len = training_parameters[ 'initial_sequence_length' ], 
+                scheduler = None, )
+
+
+
 
 
