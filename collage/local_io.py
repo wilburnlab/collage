@@ -3,8 +3,8 @@ Local I/O Functions
 '''
 
 # Libraries
-import re
-import numpy as np, pandas as pd
+
+import re, gzip
 from collage.utils import identify_alphabet
 from collage.reference_data import nucleotides, residues, codons
 
@@ -12,14 +12,21 @@ from collage.reference_data import nucleotides, residues, codons
 
 
 def read_fasta( file_name : str, 
-                first_word : bool ) -> dict: 
+                first_word : bool,
+                override_alphabet_check: bool = False, ) -> dict: 
     '''
     Return dict with keys = names, values = sequences
     '''
 
     # Read in sequences
     seq_dict = {}
-    for line in open( file_name, 'r' ):
+
+    if file_name[-3:] == '.gz':
+        fasta = gzip.open( file_name, 'rb', )
+    else:
+        fasta = open( file_name, 'r', )
+
+    for line in fasta:
         if line[0] == '>': # New seq
             name = line[1:].rstrip()
             if first_word:
@@ -32,10 +39,11 @@ def read_fasta( file_name : str,
     assert len( seq_dict ) > 0, 'No sequences found in FASTA file: ' + file_name
 
     # Infer if alphabet is nucleotide or protein
-    observed_alphabets = set( [ identify_alphabet( s ) for s in seq_dict.values() ] )
-    assert 'Unknown' not in observed_alphabets, 'Unknown characters in FASTA file: ' + file_name
-    assert len( observed_alphabets ) == 1, 'Both DNA and Protein sequences in FASTA file: ' + file_name
-    alphabet = list( observed_alphabets )[0]
+    if not override_alphabet_check:
+        observed_alphabets = set( [ identify_alphabet( s ) for s in seq_dict.values() ] )
+        assert 'Unknown' not in observed_alphabets, 'Unknown characters in FASTA file: ' + file_name
+        assert len( observed_alphabets ) == 1, 'Both DNA and Protein sequences in FASTA file: ' + file_name
+        alphabet = list( observed_alphabets )[0]
 
     # Remove sequences with degenerate nucleotides
     #if alphabet == 'DNA':
