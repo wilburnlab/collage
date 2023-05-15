@@ -2,7 +2,7 @@ import re, time, datetime
 import numpy as np, pandas as pd
 #from reference_data import Codon_to_AA, codon_to_int, residue_to_int, nt_to_int
 
-from collage.src.reference_data import nucleotides, residues, codon_to_residue, codon_to_int, residue_to_int
+from collage.reference_data import nucleotides, residues, codon_to_residue, codon_to_int, residue_to_int
 
 
 def identify_alphabet( sequence : str ) -> str:

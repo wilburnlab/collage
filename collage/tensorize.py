@@ -9,7 +9,7 @@ import numpy as np
 
 import torch
 
-from collage.src.reference_data import codons, residues, codon_to_residue, codon_to_int
+from collage.reference_data import codons, residues, codon_to_residue, codon_to_int
 
 # Global variables
 residue_to_codon_mask = dict( [ ( r, np.asarray( [ codon_to_residue[c] == r for c in codons[1:65] ], 

@@ -8,8 +8,8 @@ import random, math
 import numpy as np
 import torch
 
-from collage.src.utils import timer
-from collage.src.tensorize import records_to_batches
+from collage.utils import timer
+from collage.tensorize import records_to_batches
 
 
 

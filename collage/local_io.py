@@ -5,8 +5,8 @@ Local I/O Functions
 # Libraries
 import re
 import numpy as np, pandas as pd
-from collage.src.utils import identify_alphabet
-from collage.src.reference_data import nucleotides, residues, codons
+from collage.utils import identify_alphabet
+from collage.reference_data import nucleotides, residues, codons
 
 
 

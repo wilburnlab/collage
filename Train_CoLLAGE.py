@@ -7,14 +7,14 @@ import sys, time, argparse, time, concurrent
 
 import torch
 
-import collage.src.constants as constants
-from collage.src.local_io import read_fasta
-from collage.src.utils import dna_dictionary_to_records, timer
-from collage.src.tensorize import split_train_test_data
-from collage.src.training_code import train_loop
-from collage.src.eval_functions import Relative_Codon_Likelihood
+import collage.constants as constants
+from collage.local_io import read_fasta
+from collage.utils import dna_dictionary_to_records, timer
+from collage.tensorize import split_train_test_data
+from collage.training_code import train_loop
+from collage.eval_functions import Relative_Codon_Likelihood
 
-from collage.src.model import Codon_Predictor
+from collage.model import Codon_Predictor
 
 
 

@@ -3,9 +3,9 @@ import re
 import numpy as np
 import torch
 
-from collage.src.utils import translate
-from collage.src.utils import prot_to_coded
-from collage.src.reference_data import residue_to_int, codon_to_int, codons
+from collage.utils import translate
+from collage.utils import prot_to_coded
+from collage.reference_data import residue_to_int, codon_to_int, codons
 
 
 
