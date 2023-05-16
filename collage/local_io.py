@@ -3,9 +3,10 @@ Local I/O Functions
 '''
 
 # Libraries
+
 import re, gzip
-from collage.src.utils import identify_alphabet
-from collage.src.reference_data import nucleotides, residues, codons
+from collage.utils import identify_alphabet
+from collage.reference_data import nucleotides, residues, codons
 
 
 
@@ -26,7 +27,6 @@ def read_fasta( file_name : str,
         fasta = open( file_name, 'r', )
 
     for line in fasta:
-        line = line.decode( 'utf-8' )
         if line[0] == '>': # New seq
             name = line[1:].rstrip()
             if first_word:

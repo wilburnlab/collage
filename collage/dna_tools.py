@@ -6,8 +6,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from collage.src.utils import translate, orf_to_coded, prot_to_coded
-from collage.src.tensorize import record_slice_to_arrays, tensorize_batch
+from collage.utils import translate, orf_to_coded, prot_to_coded
+from collage.tensorize import record_slice_to_arrays, tensorize_batch
 
 
 def reverse_complement( sequence: str ) -> str:
