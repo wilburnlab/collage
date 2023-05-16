@@ -1,0 +1,2 @@
+# This file is for requirements only used in the CUDA version
+torch==2.0.1 # CUDA version
