@@ -1,19 +1,19 @@
 import torch
-from collage.model import Codon_Predictor
 import torch.profiler
 
-model = Codon_Predictor( n_input_tokens = 22, 
-                         n_output_tokens = 66,
-                         n_sp = 1, #len( species ),
-                         model_dim = 64, 
-                         ff_dim = 256,
-                         n_heads = 4,
-                         n_encoder_layers = 1, 
-                         n_decoder_layers = 2, 
-                         dropout = 0.2,
-                         max_len = 500, )
+from collage.model import CoLLAGE_model
+from collage.settings import hyperparameters, training_parameters
 
-state_dict = torch.load('test.pt')
+state_dict = torch.load('testData.pt')
+model = CoLLAGE_model( hyperparameters[ 'n_input_tokens' ],
+                           hyperparameters[ 'n_output_tokens' ],
+                           hyperparameters[ 'embed_dimension' ],
+                           hyperparameters[ 'feedforward_dimension' ],
+                           hyperparameters[ 'n_heads' ],
+                           hyperparameters[ 'n_encoder_layers' ],
+                           hyperparameters[ 'n_decoder_layers' ],
+                           training_parameters[ 'dropout_rate' ],
+                           hyperparameters[ 'max_sequence_length' ], )
 model.load_state_dict(state_dict)
 
 prot = torch.tensor([[14, 13,  6,  6, 11,  1,  3, 14, 18,  1,  4, 16, 10, 11,  1,  1,  1, 15,

@@ -4,7 +4,7 @@
     <script>
         async function main() {
             // Instantiate a session object which contains functions to load the model and run inference.
-            const session =  await ort.InferenceSession.create('./test.onnx', { executionProviders: ['wasm']});
+            const session =  await ort.InferenceSession.create('./test.onnx', { executionProviders: ['webgl']});
 
             console.log(session.inputNames);
 
