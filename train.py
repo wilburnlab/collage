@@ -7,8 +7,10 @@ import sys, time, argparse, time, concurrent
 
 import collage.constants as constants
 from collage.local_io import read_fasta
+from collage.runner import create_model
 from collage.utils import dna_dictionary_to_records, timer
 from collage.training_code import train_collage
+from collage.settings import training_parameters
 
 
 def parse_args( args: list ):
@@ -39,6 +41,11 @@ def parse_args( args: list ):
     parser.add_argument( '--gpu',
                          action = 'store_true',
                          help = 'Use GPU (CUDA) for CoLLAGE training', )
+    parser.add_argument('--epochs',
+                        type=int,
+                        help='Number of epochs to train for' +
+                             f'\n\tDefault: {training_parameters["n_epochs"]}',
+                        default=training_parameters['n_epochs'])
 
     return parser.parse_args(args)
 
@@ -47,22 +54,8 @@ def main():
     '''
     Train CoLLAGE
     '''
-    start_time = time.time()
-    args = parse_args( sys.argv[1:] )
-
-    sequences = read_fasta( args.input_fasta, first_word=True, )
-    n_seq = len( sequences )
-    print( str( n_seq ) + ' sequences loaded from ' + args.input_fasta + ' (' + timer(start_time) + ')' )
-    processed_sequences = dna_dictionary_to_records( sequences )
-    n_proc = len( processed_sequences )
-    print( str( n_proc ) + ' processed for training (' + timer(start_time) + ')' )
-
-    train_collage( output_name = args.prefix, 
-                   training_data = processed_sequences, 
-                   test_frac = args.validation_fraction, 
-                   random_seed = args.random_seed, 
-                   start_time = start_time, 
-                   device = 'cuda' if args.gpu else 'cpu', )
+    args = parse_args(sys.argv[1:])
+    create_model(**vars(args))
 
 
 if __name__ == "__main__":
