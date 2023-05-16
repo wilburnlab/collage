@@ -1,15 +1,10 @@
 '''
 Train CoLLAGE Script
 '''
-
-# Libraries
-import sys, time, argparse, time, concurrent
+import sys, argparse
 
 import collage.constants as constants
-from collage.local_io import read_fasta
 from collage.runner import create_model
-from collage.utils import dna_dictionary_to_records, timer
-from collage.training_code import train_collage
 from collage.settings import TRAINING_PARAMETERS
 
 
