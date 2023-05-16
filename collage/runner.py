@@ -18,15 +18,16 @@ def create_model(input_fasta: str,
     start_time = time.time()
     sequences = read_fasta(input_fasta, first_word=True)
     n_seq = len(sequences)
-    print(str(n_seq) + ' sequences loaded from ' + input_fasta + ' (' + timer(start_time) + ')' )
+    print(str(n_seq) + ' sequences loaded from ' +
+          input_fasta + ' (' + timer(start_time) + ')')
     processed_sequences = dna_dictionary_to_records(sequences)
     n_proc = len(processed_sequences)
     print(str(n_proc) + ' processed for training (' + timer(start_time) + ')')
 
-    train_collage(output_name = prefix, 
-                  training_data = processed_sequences, 
-                  test_frac = validation_fraction, 
-                  random_seed = random_seed, 
-                  start_time = start_time, 
-                  device = 'cuda' if gpu else 'cpu',
+    train_collage(output_name=prefix,
+                  training_data=processed_sequences,
+                  test_frac=validation_fraction,
+                  random_seed=random_seed,
+                  start_time=start_time,
+                  device='cuda' if gpu else 'cpu',
                   epochs=epochs)
