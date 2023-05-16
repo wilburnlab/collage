@@ -1,12 +1,8 @@
 '''
 Local I/O Functions
 '''
-
-# Libraries
-
-import re, gzip
+import gzip
 from collage.utils import identify_alphabet
-from collage.reference_data import nucleotides, residues, codons
 
 
 

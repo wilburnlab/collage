@@ -10,7 +10,7 @@ from collage.local_io import read_fasta
 from collage.runner import create_model
 from collage.utils import dna_dictionary_to_records, timer
 from collage.training_code import train_collage
-from collage.settings import training_parameters
+from collage.settings import TRAINING_PARAMETERS
 
 
 def parse_args( args: list ):
@@ -31,21 +31,21 @@ def parse_args( args: list ):
     parser.add_argument( '--validation_fraction',
                          type = float,
                          help = 'Fraction of data to withhold for model evaluation' +
-                                '\n\tDefault: ' + format( constants.validation_fraction,'.2f' ),
-                         default = constants.validation_fraction, )
+                                '\n\tDefault: ' + format( constants.VALIDATION_FRACTION,'.2f' ),
+                         default = constants.VALIDATION_FRACTION, )
     parser.add_argument( '--random_seed',
                          type = int,
                          help = 'Random seed for splitting training vs evaluation data' +
-                                '\n\tDefault: ' + str(constants.random_seed),
-                         default = constants.random_seed, )
+                                '\n\tDefault: ' + str(constants.RANDOM_SEED),
+                         default = constants.RANDOM_SEED, )
     parser.add_argument( '--gpu',
                          action = 'store_true',
                          help = 'Use GPU (CUDA) for CoLLAGE training', )
     parser.add_argument('--epochs',
                         type=int,
                         help='Number of epochs to train for' +
-                             f'\n\tDefault: {training_parameters["n_epochs"]}',
-                        default=training_parameters['n_epochs'])
+                             f'\n\tDefault: {TRAINING_PARAMETERS["n_epochs"]}',
+                        default=TRAINING_PARAMETERS['n_epochs'])
 
     return parser.parse_args(args)
 

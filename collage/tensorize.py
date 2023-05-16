@@ -1,26 +1,6 @@
-'''
-tensorize.py
-'''
-
-
-# Libraries
-import re, random
-import numpy as np
+import random
 
 import torch
-
-from collage.reference_data import codons, residues, codon_to_residue, codon_to_int
-
-# Global variables
-residue_to_codon_mask = dict( [ ( r, np.asarray( [ codon_to_residue[c] == r for c in codons[1:65] ], 
-                                                 'float32', ) ) 
-                                for r in residues[1:] ] )
-
-
-
-
-
-
 
 
 def split_train_test_data( processed_data: list,

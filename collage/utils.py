@@ -1,14 +1,10 @@
 import re, time, datetime, math
-import numpy as np, pandas as pd
-#from reference_data import Codon_to_AA, codon_to_int, residue_to_int, nt_to_int
+import numpy as np
 
-from collage.reference_data import nucleotides, residues, codons, codon_to_residue, codon_to_int, residue_to_int
+from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
 
-coded_codons = [ codon_to_int[ c ] for c in codons[1:65] ]
+CODED_CODONS = [ CODON_TO_INT[ c ] for c in CODONS[1:65] ]
 
-residue_to_codon_mask = dict( [ ( r, np.asarray( [ codon_to_residue[c] == r for c in codons[1:65] ], 
-                                                'float32', ) ) 
-                            for r in residues[1:] ] )
 
 
 def identify_alphabet( sequence : str ) -> str:
@@ -17,8 +13,8 @@ def identify_alphabet( sequence : str ) -> str:
     '''
 
     characters = set( sequence )
-    dna_check = characters  <= set( nucleotides )
-    protein_check = characters <= set( residues )
+    dna_check = characters  <= set( NUCLEOTIDES )
+    protein_check = characters <= set( RESIDUES )
 
     if dna_check:
         return 'DNA'
@@ -40,7 +36,7 @@ def translate( sequence: str ) -> str:
     if len( dna_sequence ) < 3: return ''
 
     obs_codons = re.findall( '...', dna_sequence )
-    obs_residues = [ codon_to_residue.get( c, 'X' ) for c in obs_codons ]
+    obs_residues = [ CODON_TO_RESIDUE.get( c, 'X' ) for c in obs_codons ]
     return ''.join( obs_residues )
 
 
@@ -64,14 +60,14 @@ def len_check( sequence: str,
 def orf_to_coded( orf: str,
                   add_start: bool = False, ) -> list:
     codons = re.findall( '...', orf )
-    coded = [ codon_to_int[c] for c in codons ]
+    coded = [ CODON_TO_INT[c] for c in codons ]
     if add_start:
         coded = [ 65 ] + coded
     return coded
 
 
 def prot_to_coded( prot: str ) -> list:
-    return [ residue_to_int[r] for r in prot ]
+    return [ RESIDUE_TO_INT[r] for r in prot ]
 
 
 def codon_counts_in_library( sequence_dict: dict ) -> np.ndarray:
@@ -79,7 +75,7 @@ def codon_counts_in_library( sequence_dict: dict ) -> np.ndarray:
     Compute the log relative frequency of each codon
     '''
 
-    codon_counts = dict( [ (c,0) for c in codons[1:65] ] )
+    codon_counts = dict( [ (c,0) for c in CODONS[1:65] ] )
     for dna_sequence in sequence_dict.values():
         codons_in_gene = re.findall( '...', dna_sequence )
         for c in codons_in_gene: codon_counts[c] += 1
@@ -93,8 +89,8 @@ def calc_codon_weights( sequence_dict: dict,
     codon_array = codon_counts_in_library( sequence_dict )
     if aa_normalize:
         norm_codon_array = np.zeros( codon_array.shape )
-        for r in residue_to_codon_mask:
-            residue_counts = codon_array * residue_to_codon_mask[r]
+        for r in RESIDUE_TO_CODON_MASK:
+            residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
             norm_counts = residue_counts / np.sum(residue_counts)
             norm_codon_array += norm_counts
         #codon_array =
@@ -105,7 +101,7 @@ def calc_codon_weights( sequence_dict: dict,
     effective_n = ( 1 - np.power( beta, codon_array, ) ) / ( 1 - beta )
     weight_array = np.mean( effective_n ) / effective_n
     weight_array = np.ones( weight_array.shape )
-    weight_dict = dict( zip( coded_codons, list( weight_array ) ) )
+    weight_dict = dict( zip( CODED_CODONS, list( weight_array ) ) )
     return weight_dict
 
 
@@ -117,11 +113,11 @@ def codedorf_to_weights( orf_coded: list,
 def calc_null_codon_logL( sequence_dict: dict, ) -> dict:
     codon_array = codon_counts_in_library( sequence_dict )
     norm_codon_array = np.zeros( codon_array.shape )
-    for r in residue_to_codon_mask:
-        residue_counts = codon_array * residue_to_codon_mask[r]
+    for r in RESIDUE_TO_CODON_MASK:
+        residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
         norm_counts = residue_counts / np.sum(residue_counts)
         norm_codon_array += norm_counts
-    norm_codon_dict = dict( zip( coded_codons, list( np.log( norm_codon_array ) ) ) )
+    norm_codon_dict = dict( zip( CODED_CODONS, list( np.log( norm_codon_array ) ) ) )
     return norm_codon_dict
 
 
