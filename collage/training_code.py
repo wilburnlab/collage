@@ -8,12 +8,12 @@ import random, math
 import numpy as np
 import torch
 
-from collage.src.utils import timer
-from collage.src.tensorize import records_to_batches
-from collage.src.eval_functions import Weighted_Likelihood, calc_accuracy
-from collage.src.tensorize import split_train_test_data
-from collage.src.model import initialize_CoLLAGE_model
-from collage.src.settings import training_parameters
+from collage.utils import timer
+from collage.tensorize import records_to_batches
+from collage.eval_functions import Weighted_Likelihood, calc_accuracy
+from collage.tensorize import split_train_test_data
+from collage.model import initialize_CoLLAGE_model
+from collage.settings import training_parameters
 
 
 

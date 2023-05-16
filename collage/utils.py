@@ -2,7 +2,7 @@ import re, time, datetime, math
 import numpy as np, pandas as pd
 #from reference_data import Codon_to_AA, codon_to_int, residue_to_int, nt_to_int
 
-from collage.src.reference_data import nucleotides, residues, codons, codon_to_residue, codon_to_int, residue_to_int
+from collage.reference_data import nucleotides, residues, codons, codon_to_residue, codon_to_int, residue_to_int
 
 coded_codons = [ codon_to_int[ c ] for c in codons[1:65] ]
 

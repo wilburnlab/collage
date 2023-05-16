@@ -5,10 +5,10 @@ Train CoLLAGE Script
 # Libraries
 import sys, time, argparse, time, concurrent
 
-import collage.src.constants as constants
-from collage.src.local_io import read_fasta
-from collage.src.utils import dna_dictionary_to_records, timer
-from collage.src.training_code import train_collage
+import collage.constants as constants
+from collage.local_io import read_fasta
+from collage.utils import dna_dictionary_to_records, timer
+from collage.training_code import train_collage
 
 
 def parse_args( args: list ):

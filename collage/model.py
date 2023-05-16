@@ -3,8 +3,8 @@ import math
 import torch
 import torch.nn as nn
 
-from collage.src.reference_data import codon_to_residue, codons, residues, int_to_residue
-from collage.src.settings import hyperparameters, training_parameters
+from collage.reference_data import codon_to_residue, codons, residues, int_to_residue
+from collage.settings import hyperparameters, training_parameters
 
 
 class PositionalEncoding(nn.Module):
