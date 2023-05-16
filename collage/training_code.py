@@ -110,7 +110,7 @@ def train_loop( model,
 
 
 def train_collage( output_name, training_data, test_frac, random_seed, start_time, 
-                   device = None, start_model = None, ):
+                   device = None, start_model = None, epochs=training_parameters['n_epochs']):
 
     data_by_mode = split_train_test_data( training_data, 
                                           test_frac, 
@@ -127,7 +127,7 @@ def train_collage( output_name, training_data, test_frac, random_seed, start_tim
                 data_by_mode = data_by_mode, 
                 output_name = output_name, 
                 start_time = start_time, 
-                epochs = training_parameters[ 'n_epochs' ], 
+                epochs = epochs, 
                 epochs_to_2x_length = training_parameters[ 'epochs_to_2x_length' ],
                 device = device, 
                 train_batch_size = training_parameters[ 'train_batch_size' ], 
