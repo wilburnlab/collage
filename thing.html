@@ -1,0 +1,29 @@
+<html>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.16.0-dev.20230508-045c623415/ort.min.js"></script>
+    <script>
+        async function main() {
+            // Instantiate a session object which contains functions to load the model and run inference.
+            const session =  await ort.InferenceSession.create('./test.onnx', { executionProviders: ['wasm']});
+
+            console.log(session.inputNames);
+
+                // Create two Tensors to hold the input data to the model.
+            // The Tensor class is part of the onnxruntime-web module.
+            // The 'float32' here indicates the data type, and [4, 30] is the shape of the Tensor.
+            const tensor1 = new ort.Tensor('float32', new Float32Array(4 * 30), [4, 30]);
+            const tensor2 = new ort.Tensor('float32', new Float32Array(4 * 30), [4, 30]);
+
+            // Run inference.
+            // Replace 'input1' and 'input2' with the actual names of your model's inputs.
+            const inputMap = { 'prot': tensor1, 'cds': tensor2 };
+            const outputMap = await session.run(inputMap);
+
+            // Log the result.
+            console.log(outputMap);
+        }
+
+        main().catch(console.error);
+    </script>
+  </body>
+</html>
