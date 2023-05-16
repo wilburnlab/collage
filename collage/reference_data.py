@@ -1,10 +1,8 @@
-'''
-Reference data
-'''
+import numpy as np
 
-nucleotides = [ '-', 'A', 'T', 'C', 'G', ]
+NUCLEOTIDES = [ '-', 'A', 'T', 'C', 'G', ]
 
-codon_to_residue = { '---':'-',
+CODON_TO_RESIDUE = { '---':'-',
                      'TTT':'F', 'TCT':'S', 'TAT':'Y', 'TGT':'C',
                      'TTC':'F', 'TCC':'S', 'TAC':'Y', 'TGC':'C',
                      'TTA':'L', 'TCA':'S', 'TAA':'.', 'TGA':'.',
@@ -24,16 +22,20 @@ codon_to_residue = { '---':'-',
                      '***':'*',
                    }
 
-codons = list( codon_to_residue )
-codon_to_int = dict( zip( codons, range( len(codons) ) ) )
-int_to_codon = dict( [ x[::-1] for x in codon_to_int.items() ] )
+CODONS = list( CODON_TO_RESIDUE )
+CODON_TO_INT = dict( zip( CODONS, range( len(CODONS) ) ) )
+INT_TO_CODON = dict( [ x[::-1] for x in CODON_TO_INT.items() ] )
 
 
-residues = [ '-',
+RESIDUES = [ '-',
              'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
              'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', 
              '.', ]
-residue_to_int = dict( zip( residues, range( len(residues) ) ) )
-int_to_residue = dict( [ x[::-1] for x in residue_to_int.items() ] )
+RESIDUE_TO_INT = dict( zip( RESIDUES, range( len(RESIDUES) ) ) )
+INT_TO_RESIDUE = dict( [ x[::-1] for x in RESIDUE_TO_INT.items() ] )
+
+RESIDUE_TO_CODON_MASK = dict( [ ( r, np.asarray( [ CODON_TO_RESIDUE[c] == r for c in CODONS[1:65] ], 
+                                                 'float32', ) ) 
+                                for r in RESIDUES[1:] ] )
 
 

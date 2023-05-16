@@ -5,7 +5,7 @@ import torch
 
 from collage.utils import translate
 from collage.utils import prot_to_coded
-from collage.reference_data import residue_to_int, codon_to_int, codons
+from collage.reference_data import RESIDUE_TO_INT, CODON_TO_INT, CODONS
 
 
 
@@ -50,9 +50,9 @@ def beam_generator( model, prot, pre_sequence='', gen_size=500, max_seqs = 100, 
         for seq in current_seqs:
             s_codons = re.findall( '...', seq )
             if len( s_codons ) >= gen_size:
-                coded_seqs.append( [ codon_to_int[ c ] for c in s_codons[ -gen_size: ] ] )
+                coded_seqs.append( [ CODON_TO_INT[ c ] for c in s_codons[ -gen_size: ] ] )
             else:
-                coded_seqs.append( [ 65 ] + [ codon_to_int[ c ] for c in s_codons ] )
+                coded_seqs.append( [ 65 ] + [ CODON_TO_INT[ c ] for c in s_codons ] )
         orf_tensor = torch.Tensor( coded_seqs ).to( torch.int64 )
         prot_tensor = prot_tensor_0.repeat( orf_tensor.size(0), 1, )
         
@@ -62,7 +62,7 @@ def beam_generator( model, prot, pre_sequence='', gen_size=500, max_seqs = 100, 
         logLs = output.cpu().detach().numpy()[ :, -1, : ]
         candidate_seqs = { }
         for j, seq in enumerate( current_seqs ):
-            codon_logL = dict( [ ( c, l ) for c, l in zip( codons, logLs[j] ) if np.isfinite( l ) ] )
+            codon_logL = dict( [ ( c, l ) for c, l in zip( CODONS, logLs[j] ) if np.isfinite( l ) ] )
             for c in codon_logL:
                 if gc_100_check( seq + c ): continue # Avoid >65% GC
                 candidate_seqs[ seq + c ] = current_seqs[ seq ] + codon_logL[ c ]
@@ -87,18 +87,18 @@ def seq_scorer( model, cds, gen_size=500, ):
             prot_seq = prot[ : gen_size ]
         else:
             prot_seq = prot[ i - gen_size + 1 : i+1 ]
-        prot_coded =  [ residue_to_int[ r ] for r in prot_seq ]
+        prot_coded =  [ RESIDUE_TO_INT[ r ] for r in prot_seq ]
         prot_tensor = torch.tensor( [ prot_coded ] ).to( torch.int64 )
         
         if i >= gen_size:
-            coded_orf = [ [ codon_to_int[ c ] for c in s_codons[ i-gen_size:i ] ] ]
+            coded_orf = [ [ CODON_TO_INT[ c ] for c in s_codons[ i-gen_size:i ] ] ]
         else:
-            coded_orf = [ [ 65 ] + [ codon_to_int[ c ] for c in s_codons[:i] ] ]
+            coded_orf = [ [ 65 ] + [ CODON_TO_INT[ c ] for c in s_codons[:i] ] ]
         orf_tensor = torch.Tensor( coded_orf ).to( torch.int64 )
 
         weights_tensor = torch.ones( prot_tensor.shape )
         output = model( prot_tensor, orf_tensor, ).cpu().detach().numpy()[ 0, -1, : ]
-        logLs.append( output[ codon_to_int[ s_codons[i] ] ] )
+        logLs.append( output[ CODON_TO_INT[ s_codons[i] ] ] )
         best_codons.append( np.argmax( output ) )
         best_codon_scores.append( output[ best_codons[-1] ] )
         

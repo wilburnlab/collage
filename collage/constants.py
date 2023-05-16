@@ -3,5 +3,5 @@ Constant values to use as defaults
 '''
 
 
-validation_fraction = 0.2
-random_seed = 2447
+VALIDATION_FRACTION = 0.2
+RANDOM_SEED = 2447

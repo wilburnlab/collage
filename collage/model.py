@@ -3,8 +3,8 @@ import math
 import torch
 import torch.nn as nn
 
-from collage.reference_data import codon_to_residue, codons, residues, int_to_residue
-from collage.settings import hyperparameters, training_parameters
+from collage.reference_data import CODON_TO_RESIDUE, CODONS, RESIDUES, INT_TO_RESIDUE
+from collage.settings import HYPERPARAMETERS, TRAINING_PARAMETERS
 
 
 class PositionalEncoding(nn.Module):
@@ -36,7 +36,7 @@ class PositionalEncoding(nn.Module):
         return self.dropout( token_embedding + self.pos_encoding[ :, :token_embedding.size(1), : ] )
 
 
-class Prot_Encoder( nn.Module ):
+class ProtEncoder( nn.Module ):
     def __init__( self, n_tokens, embed_dim, ff_dim, n_heads, n_layers, dropout, max_len, ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -57,7 +57,7 @@ class Prot_Encoder( nn.Module ):
         x = self.transformer_encoder( x, src_key_padding_mask = pad_mask, )
         return x
 
-class Codon_Decoder( nn.Module ):
+class CodonDecoder( nn.Module ):
     def __init__( self, n_tokens, embed_dim, ff_dim, n_heads, n_layers, dropout, max_len, ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -89,21 +89,21 @@ class Codon_Decoder( nn.Module ):
                                       
         return x
 
-class CoLLAGE_model( nn.Module ):
+class CollageModel( nn.Module ):
     def __init__( self, n_input_tokens, n_output_tokens, embed_dim, ff_dim,
                   n_heads, n_encoder_layers, n_decoder_layers, dropout,
                   max_len, ):
         super().__init__()
 
 
-        self.protein_encoder = Prot_Encoder( n_input_tokens, 
+        self.protein_encoder = ProtEncoder( n_input_tokens, 
                                           embed_dim, 
                                           ff_dim, 
                                           n_heads, 
                                           n_encoder_layers, 
                                           dropout, 
                                           max_len, )
-        self.codon_decoder = Codon_Decoder( n_output_tokens, 
+        self.codon_decoder = CodonDecoder( n_output_tokens, 
                                             embed_dim, 
                                             ff_dim, 
                                             n_heads, 
@@ -111,9 +111,9 @@ class CoLLAGE_model( nn.Module ):
                                             dropout, 
                                             max_len, )
         
-        codon_mask_embedding = [ [ float( int_to_residue[i] == codon_to_residue[ codons[j] ] )
-                                   for j in range( len(codons) - 1 ) ] 
-                                 for i in range( len(residues) ) ]
+        codon_mask_embedding = [ [ float( INT_TO_RESIDUE[i] == CODON_TO_RESIDUE[ CODONS[j] ] )
+                                   for j in range( len(CODONS) - 1 ) ] 
+                                 for i in range( len(RESIDUES) ) ]
         self.codon_masker = nn.Embedding.from_pretrained( torch.tensor( codon_mask_embedding ) )
         self.linear = nn.Linear( embed_dim, n_output_tokens-1)
         nn.init.constant_( self.linear.bias, -math.log(64.0-1) )
@@ -133,19 +133,19 @@ class CoLLAGE_model( nn.Module ):
         return self.softmax( x + codon_mask[ :, :x.size(1), : ] )
 
 
-def initialize_CoLLAGE_model( model_file = None, gpu = False, ):
+def initialize_collage_model( model_file = None, gpu = False, ):
     
     device = 'cuda' if gpu else 'cpu'
     
-    model = CoLLAGE_model( hyperparameters[ 'n_input_tokens' ],
-                           hyperparameters[ 'n_output_tokens' ],
-                           hyperparameters[ 'embed_dimension' ],
-                           hyperparameters[ 'feedforward_dimension' ],
-                           hyperparameters[ 'n_heads' ],
-                           hyperparameters[ 'n_encoder_layers' ],
-                           hyperparameters[ 'n_decoder_layers' ],
-                           training_parameters[ 'dropout_rate' ],
-                           hyperparameters[ 'max_sequence_length' ], )
+    model = CollageModel( HYPERPARAMETERS[ 'n_input_tokens' ],
+                           HYPERPARAMETERS[ 'n_output_tokens' ],
+                           HYPERPARAMETERS[ 'embed_dimension' ],
+                           HYPERPARAMETERS[ 'feedforward_dimension' ],
+                           HYPERPARAMETERS[ 'n_heads' ],
+                           HYPERPARAMETERS[ 'n_encoder_layers' ],
+                           HYPERPARAMETERS[ 'n_decoder_layers' ],
+                           TRAINING_PARAMETERS[ 'dropout_rate' ],
+                           HYPERPARAMETERS[ 'max_sequence_length' ], )
     if model_file:
         model.load_state_dict( torch.load( model_file, 
                                            map_location=torch.device(device), ), 

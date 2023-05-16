@@ -1,7 +1,7 @@
 import torch
 
 
-hyperparameters = { 'n_input_tokens' : 22,
+HYPERPARAMETERS = { 'n_input_tokens' : 22,
                     'n_output_tokens' : 66,
                     'embed_dimension' : 64,
                     'feedforward_dimension' : 256,
@@ -10,7 +10,7 @@ hyperparameters = { 'n_input_tokens' : 22,
                     'n_decoder_layers' : 2,
                     'max_sequence_length' : 500, }
 
-training_parameters = { 'n_epochs' : 250,
+TRAINING_PARAMETERS = { 'n_epochs' : 250,
                         'learning_rate' : 1e-1,
                         'dropout_rate' : 0.20,
                         'train_batch_size' : 4,

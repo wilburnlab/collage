@@ -1,20 +1,12 @@
-'''
-Description
-'''
-
-
-# Libraries
-import random, math
-import numpy as np
+import math
 import torch
 
 from collage.utils import timer
 from collage.tensorize import records_to_batches
-from collage.eval_functions import Weighted_Likelihood, calc_accuracy
+from collage.eval_functions import WeightedLikelihood, calc_accuracy
 from collage.tensorize import split_train_test_data
-from collage.model import initialize_CoLLAGE_model
-from collage.settings import training_parameters
-
+from collage.model import initialize_collage_model
+from collage.settings import TRAINING_PARAMETERS
 
 
 def train_loop( model, 
@@ -110,16 +102,16 @@ def train_loop( model,
 
 
 def train_collage( output_name, training_data, test_frac, random_seed, start_time, 
-                   device = None, start_model = None, epochs=training_parameters['n_epochs']):
+                   device = None, start_model = None, epochs=TRAINING_PARAMETERS['n_epochs']):
 
     data_by_mode = split_train_test_data( training_data, 
                                           test_frac, 
                                           random_seed )
-    loss_fx = Weighted_Likelihood(  )
-    model = initialize_CoLLAGE_model( start_model, 
+    loss_fx = WeightedLikelihood(  )
+    model = initialize_collage_model( start_model, 
                                       gpu = device == 'cuda', )
-    optimizer = training_parameters[ 'optimizer' ]( model.parameters(),
-                                                    lr = training_parameters[ 'learning_rate' ], )
+    optimizer = TRAINING_PARAMETERS[ 'optimizer' ]( model.parameters(),
+                                                    lr = TRAINING_PARAMETERS[ 'learning_rate' ], )
 
     train_loop( model = model,
                 optimizer = optimizer, 
@@ -128,13 +120,8 @@ def train_collage( output_name, training_data, test_frac, random_seed, start_tim
                 output_name = output_name, 
                 start_time = start_time, 
                 epochs = epochs, 
-                epochs_to_2x_length = training_parameters[ 'epochs_to_2x_length' ],
+                epochs_to_2x_length = TRAINING_PARAMETERS[ 'epochs_to_2x_length' ],
                 device = device, 
-                train_batch_size = training_parameters[ 'train_batch_size' ], 
-                initial_seq_len = training_parameters[ 'initial_sequence_length' ], 
+                train_batch_size = TRAINING_PARAMETERS[ 'train_batch_size' ], 
+                initial_seq_len = TRAINING_PARAMETERS[ 'initial_sequence_length' ], 
                 scheduler = None, )
-
-
-
-
-

@@ -1,9 +1,8 @@
 
 
-import os, shutil, regex, concurrent, pickle, time
+import os, regex, concurrent, pickle, time
 import numpy as np
 
-import torch
 import torch.nn as nn
 
 from collage.utils import translate, orf_to_coded, prot_to_coded
@@ -18,7 +17,7 @@ def reverse_complement( sequence: str ) -> str:
     return temp_seq.upper()[::-1]
 
 
-def ORF_searcher( dna_sequence: str, 
+def orf_searcher( dna_sequence: str, 
                   min_length: int = 30, 
                   both_strands: bool = False,
                   longest_only: bool = True,
@@ -110,7 +109,7 @@ def library_to_orf_records( sequence_library: dict,
     if not executor:
         orf_records = [ ]
         for name in sequence_library:
-            orf_records += ORF_searcher( dna_sequence = sequence_library[ name ],
+            orf_records += orf_searcher( dna_sequence = sequence_library[ name ],
                                          min_length = min_length,
                                          both_strands = both_strands, 
                                          longest_only = longest_only,
@@ -124,7 +123,7 @@ def library_to_orf_records( sequence_library: dict,
         #    batch = list( library_items[ i : i + executor_batch_size ] )
         #temp_dir = 'tmp' + str( round(time.time()) )
         #os.mkdir( temp_dir )
-        futures = [ executor.submit( ORF_searcher, 
+        futures = [ executor.submit( orf_searcher, 
                                      sequence,
                                      min_length,
                                      both_strands,

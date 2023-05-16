@@ -1,16 +1,12 @@
 '''
 Functions for model evaluation (loss)
 '''
-
-# Libraries
-import math
-import numpy as np
 import torch
 import torch.nn as nn
 
 
 
-class Weighted_Likelihood( nn.Module ):
+class WeightedLikelihood( nn.Module ):
     def __init__( self, ): #log_codon_freq : np.ndarray, ):
         super().__init__()
 
@@ -44,11 +40,3 @@ def calc_accuracy( targets : torch.Tensor,
     n = targets.flatten().size( 0 )
     accuracy = torch.sum( max_idx_class == targets ).item() / n
     return accuracy
-
-
-
-
-
-
-
-
