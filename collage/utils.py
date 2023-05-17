@@ -52,7 +52,7 @@ def orf_check(prot: str) -> bool:
 
 def len_check(sequence: str,
               min_len: int,
-              max_len: int, ) -> bool:
+              max_len: int) -> bool:
     '''
     Check if a sequence is within a given min/max len
     '''
@@ -61,7 +61,7 @@ def len_check(sequence: str,
 
 
 def orf_to_coded(orf: str,
-                 add_start: bool = False, ) -> list:
+                 add_start: bool = False) -> list:
     codons = re.findall('...', orf)
     coded = [CODON_TO_INT[c] for c in codons]
     if add_start:
@@ -90,7 +90,7 @@ def codon_counts_in_library(sequence_dict: dict) -> np.ndarray:
 
 def calc_codon_weights(sequence_dict: dict,
                        beta_factor: float = 4.0,
-                       aa_normalize: bool = False, ) -> dict:
+                       aa_normalize: bool = False) -> dict:
     codon_array = codon_counts_in_library(sequence_dict)
     if aa_normalize:
         norm_codon_array = np.zeros(codon_array.shape)
@@ -103,7 +103,7 @@ def calc_codon_weights(sequence_dict: dict,
         # I SHOULD BE ABLE TO DO THIS FAIRLY SIMPLY USING THE RESIDUE_TO_CODON_MASK FEATURE TO GET THE RELATIVE
         # ABUNDANCE OF THE AA
     beta = 1 - math.pow(10.0, -beta_factor)
-    effective_n = (1 - np.power(beta, codon_array, )) / (1 - beta)
+    effective_n = (1 - np.power(beta, codon_array)) / (1 - beta)
     weight_array = np.mean(effective_n) / effective_n
     weight_array = np.ones(weight_array.shape)
     weight_dict = dict(zip(CODED_CODONS, list(weight_array)))
@@ -115,7 +115,7 @@ def codedorf_to_weights(orf_coded: list,
     return [weight_dict[c] for c in orf_coded]
 
 
-def calc_null_codon_logL(sequence_dict: dict, ) -> dict:
+def calc_null_codon_logL(sequence_dict: dict) -> dict:
     codon_array = codon_counts_in_library(sequence_dict)
     norm_codon_array = np.zeros(codon_array.shape)
     for r in RESIDUE_TO_CODON_MASK:
@@ -128,7 +128,7 @@ def calc_null_codon_logL(sequence_dict: dict, ) -> dict:
 
 def dna_dictionary_to_records(dna_dict: dict,
                               min_aa: int = 30,
-                              max_aa: int = 2000, ) -> list:
+                              max_aa: int = 2000) -> list:
     '''
     Process DNA dictionary into a list of dictionaries with processed data
     '''
@@ -146,14 +146,14 @@ def dna_dictionary_to_records(dna_dict: dict,
             record['Translation'] = prot
             record['Length'] = len(prot)
             record['Translation_coded'] = prot_to_coded(prot)
-            record['Codon_weights'] = codedorf_to_weights(record['ORF_coded'][1:], norm_codon_dict, )  # Remove start
+            record['Codon_weights'] = codedorf_to_weights(record['ORF_coded'][1:], norm_codon_dict)  # Remove start
             records.append(record)
     return records
     # df = pd.DataFrame.from_records( records )
     # return df
 
 
-def timer(start, ):
+def timer(start):
     return str(datetime.timedelta(seconds=round(time.time() - start)))
 
 
@@ -162,7 +162,7 @@ def timer(start, ):
 
 
 '''
-def dna_to_prot_dict( dna_dict, min_aa = 30, max_aa = 2000, ):
+def dna_to_prot_dict( dna_dict, min_aa = 30, max_aa = 2000):
     prot_dict = { }
     for seq_name in dna_dict:
         prot = translate( dna_dict[seq_name] )
@@ -171,7 +171,7 @@ def dna_to_prot_dict( dna_dict, min_aa = 30, max_aa = 2000, ):
     return prot_dict
 
 
-def seqdict_to_df( dna_dict, min_aa = 30, max_aa = 2000, ):
+def seqdict_to_df( dna_dict, min_aa = 30, max_aa = 2000):
     rows = [ ]
     for seq_name in dna_dict:
         prot = translate( dna_dict[seq_name] )

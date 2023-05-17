@@ -6,12 +6,12 @@ import torch.nn as nn
 
 
 class WeightedLikelihood(nn.Module):
-    def __init__(self, ):  # log_codon_freq : np.ndarray, ):
+    def __init__(self):  # log_codon_freq : np.ndarray):
         super().__init__()
 
-        # self.prior = nn.Embedding( 64, 1, )
+        # self.prior = nn.Embedding( 64, 1)
         # self.prior.weight = nn.Parameter( torch.Tensor( log_codon_freq ),
-        #                                  requires_grad=False, )
+        #                                  requires_grad=False)
 
         self.nllloss = nn.NLLLoss(reduction='none')
 

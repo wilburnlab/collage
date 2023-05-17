@@ -66,9 +66,9 @@ def train_loop(model,
                     x.to(device) for x in batch]  # , sp, null
                 targets = cds[:, 1:]
                 n = prot.flatten().size(0)
-                pred = model(prot, cds[:, :-1], )  # sp )
+                pred = model(prot, cds[:, :-1])  # sp )
                 loss = loss_fx(pred, targets, weight)
-                accuracy = calc_accuracy(targets, pred, )
+                accuracy = calc_accuracy(targets, pred)
 
                 if mode == 'train':
                     optimizer.zero_grad()
