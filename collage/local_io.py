@@ -5,11 +5,9 @@ import gzip
 from collage.utils import identify_alphabet
 
 
-
-
-def read_fasta( file_name : str, 
-                first_word : bool,
-                override_alphabet_check: bool = False, ) -> dict: 
+def read_fasta(file_name: str,
+               first_word: bool,
+               override_alphabet_check: bool = False) -> dict:
     '''
     Return dict with keys = names, values = sequences
     '''
@@ -18,56 +16,56 @@ def read_fasta( file_name : str,
     seq_dict = {}
 
     if file_name[-3:] == '.gz':
-        fasta = gzip.open( file_name, 'rb', )
+        fasta = gzip.open(file_name, 'rb')
     else:
-        fasta = open( file_name, 'r', )
+        fasta = open(file_name, 'r')
 
     for line in fasta:
-        if line[0] == '>': # New seq
+        if line[0] == '>':  # New seq
             name = line[1:].rstrip()
             if first_word:
-                name = name.split(' ')[0] # Uniprot style
-            seq_dict[ name ] = ''
+                name = name.split(' ')[0]  # Uniprot style
+            seq_dict[name] = ''
         else:
-            seq_dict[ name ] += line.rstrip()
+            seq_dict[name] += line.rstrip()
 
     # Ensure there are sequences in the file
-    assert len( seq_dict ) > 0, 'No sequences found in FASTA file: ' + file_name
+    assert len(seq_dict) > 0, 'No sequences found in FASTA file: ' + file_name
 
     # Infer if alphabet is nucleotide or protein
     if not override_alphabet_check:
-        observed_alphabets = set( [ identify_alphabet( s ) for s in seq_dict.values() ] )
+        observed_alphabets = set([identify_alphabet(s)
+                                 for s in seq_dict.values()])
         assert 'Unknown' not in observed_alphabets, 'Unknown characters in FASTA file: ' + file_name
-        assert len( observed_alphabets ) == 1, 'Both DNA and Protein sequences in FASTA file: ' + file_name
-        alphabet = list( observed_alphabets )[0]
+        assert len(
+            observed_alphabets) == 1, 'Both DNA and Protein sequences in FASTA file: ' + file_name
+        alphabet = list(observed_alphabets)[0]
 
     # Remove sequences with degenerate nucleotides
-    #if alphabet == 'DNA':
+    # if alphabet == 'DNA':
     #    seq_dict = dict( [ x for x in seq_dict.items() if set( x[1] ) <= set( nucleotides ) ] )
-    
+
     # Return seq dict
     return seq_dict
 
 
-
-def write_fasta( seq_dict: dict, 
-                 file_name: str,
-                 append: bool = True ) -> None:
+def write_fasta(seq_dict: dict,
+                file_name: str,
+                append: bool = True) -> None:
     '''
     Write a sequence dictionary to FASTA file, defaults to append rather than overwrite.
     In append mode, will create a new file first if it doesn't already exist
     '''
 
-    if append == False: # overwrite mode
+    if append == False:  # overwrite mode
         write_mode = 'w'
-    else: # append mode
-        write_mode = 'a' if os.path.isfile( file_name ) else 'w'
+    else:  # append mode
+        write_mode = 'a' if os.path.isfile(file_name) else 'w'
 
-    file_out = open( file_name, write_mode, )
+    file_out = open(file_name, write_mode)
 
     for name, seq in seq_dict.items():
-        file_out.write( '>' + name + '\n' + seq + '\n' )
+        file_out.write('>' + name + '\n' + seq + '\n')
 
     file_out.close()
     return None
-
