@@ -26,7 +26,7 @@ def test_end_to_end_training(tmp_path):
                  RANDOM_SEED,
                  False,
                  10)
-    
+
     # Check that the model state was saved to disk
     expected_pt_file = prefix.with_suffix('.pt')
     assert expected_pt_file.exists()
