@@ -1,9 +1,12 @@
 from pathlib import Path
 import pytest
 from typing import Dict
-from collage.fasta import read_fasta
+from collage.fasta import FileContentsError, read_fasta
 
 from pytest_mock import MockFixture
+
+# TODO(auberon): Better understand first_word and override_alphabet_check in read_fasta to write tests for them
+# TODO(auberon): Test write_fasta
 
 
 @pytest.fixture
@@ -60,3 +63,13 @@ def test_read_fasta_works_with_path_object(
     mocker.patch('gzip.open', tiny_fasta_file_contents)
     actual = read_fasta(Path('tiny.fast.gz'), True)
     assert tiny_fasta_seq_dict == actual
+
+
+def test_read_empty_fasta_raises_FileContentsError(mocker: MockFixture):
+    empty_file = mocker.mock_open(read_data="")
+    mocker.patch('builtins.open', empty_file)
+
+    with pytest.raises(FileContentsError) as e:
+        read_fasta('empty.fasta', True)
+
+    assert 'empty.fasta' in str(e.value)
