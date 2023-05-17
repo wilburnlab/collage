@@ -6,7 +6,7 @@ from collage.tensorize import records_to_batches
 from collage.eval_functions import WeightedLikelihood, calc_accuracy
 from collage.tensorize import split_train_test_data
 from collage.model import initialize_collage_model
-from collage.settings import TRAINING_PARAMETERS
+from collage.defaults import TRAINING_PARAMETERS
 
 
 def train_loop(model,

@@ -19,3 +19,6 @@ TRAINING_PARAMETERS = {'n_epochs': 250,
                        'epochs_to_2x_length': 50,
                        'optimizer': torch.optim.SGD,
                        }
+
+VALIDATION_FRACTION = 0.2
+RANDOM_SEED = 2447

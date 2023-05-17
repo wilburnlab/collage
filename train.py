@@ -4,9 +4,10 @@ Train CoLLAGE Script
 import sys
 import argparse
 
-import collage.constants as constants
+import collage.defaults as constants
 from collage.runner import create_model
-from collage.settings import TRAINING_PARAMETERS
+from collage.defaults import TRAINING_PARAMETERS
+import collage.defaults
 
 
 def parse_args(args: list):
@@ -28,8 +29,8 @@ def parse_args(args: list):
                         type=float,
                         help='Fraction of data to withhold for model evaluation' +
                         '\n\tDefault: ' +
-                        format(constants.VALIDATION_FRACTION, '.2f'),
-                        default=constants.VALIDATION_FRACTION)
+                        format(collage.defaults.VALIDATION_FRACTION, '.2f'),
+                        default=collage.defaults.VALIDATION_FRACTION)
     parser.add_argument('--random_seed',
                         type=int,
                         help='Random seed for splitting training vs evaluation data' +

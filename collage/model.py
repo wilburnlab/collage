@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 from collage.reference_data import CODON_TO_RESIDUE, CODONS, RESIDUES, INT_TO_RESIDUE
-from collage.settings import HYPERPARAMETERS, TRAINING_PARAMETERS
+from collage.defaults import HYPERPARAMETERS, TRAINING_PARAMETERS
 
 
 class PositionalEncoding(nn.Module):

@@ -1,10 +1,7 @@
-
-
 import os
 import regex
 import concurrent
 import pickle
-import time
 import numpy as np
 
 import torch.nn as nn
@@ -31,8 +28,6 @@ def orf_searcher(dna_sequence: str,
     '''
     Generate a list of records describing potential ORFs in a given DNA sequence
     '''
-
-    # print( sequence_name )
 
     ORF_search = regex.compile('ATG(?:...){2,}?(?:TAG|TAA|TGA|TRA|TAR)')
 
