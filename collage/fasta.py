@@ -2,35 +2,37 @@
 Local I/O Functions
 '''
 import gzip
+from pathlib import Path
 from collage.utils import identify_alphabet
 
 
-def read_fasta(file_name: str,
+class FileContentsError(RuntimeError):
+    pass
+
+
+def read_fasta(file_name: str | Path,
                first_word: bool,
                override_alphabet_check: bool = False) -> dict:
     '''
     Return dict with keys = names, values = sequences
     '''
-
-    # Read in sequences
     seq_dict = {}
 
-    if file_name[-3:] == '.gz':
-        fasta = gzip.open(file_name, 'rb')
-    else:
-        fasta = open(file_name, 'r')
-
-    for line in fasta:
-        if line[0] == '>':  # New seq
-            name = line[1:].rstrip()
-            if first_word:
-                name = name.split(' ')[0]  # Uniprot style
-            seq_dict[name] = ''
-        else:
-            seq_dict[name] += line.rstrip()
+    file_name = Path(file_name)
+    file_opener = gzip.open if file_name.suffix == '.gz' else open
+    with file_opener(file_name, 'rt') as fasta:
+        for line in fasta:
+            if line[0] == '>':  # New seq
+                name = line[1:].rstrip()
+                if first_word:
+                    name = name.split(' ')[0]  # Uniprot style
+                seq_dict[name] = ''
+            else:
+                seq_dict[name] += line.rstrip()
 
     # Ensure there are sequences in the file
-    assert len(seq_dict) > 0, 'No sequences found in FASTA file: ' + file_name
+    if not seq_dict:
+        raise FileContentsError(f'No sequences found in FASTA file: "{file_name}"')
 
     # Infer if alphabet is nucleotide or protein
     if not override_alphabet_check:
@@ -45,7 +47,6 @@ def read_fasta(file_name: str,
     # if alphabet == 'DNA':
     #    seq_dict = dict( [ x for x in seq_dict.items() if set( x[1] ) <= set( nucleotides ) ] )
 
-    # Return seq dict
     return seq_dict
 
 

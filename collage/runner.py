@@ -1,5 +1,5 @@
 import time
-from collage.local_io import read_fasta
+from collage.fasta import read_fasta
 from collage.training_code import train_collage
 
 from collage.utils import dna_dictionary_to_records, timer
