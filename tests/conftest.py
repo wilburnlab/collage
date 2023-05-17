@@ -10,12 +10,6 @@ def test_data_path() -> Path:
 
 
 @pytest.fixture
-def unzipped_tiny_fasta_path(test_data_path: Path) -> Path:
+def ecoli10_path(test_data_path: Path) -> Path:
     '''Path to a small fasta file with 10 ecoli sequences'''
-    return test_data_path / 'tiny.fasta'
-
-
-@pytest.fixture
-def zipped_tiny_fasta_path(test_data_path: Path) -> Path:
-    '''Path to a gzipped small fasta file with 10 ecoli sequences'''
-    return test_data_path / 'tiny.fasta.gz'
+    return test_data_path / 'ecoli10.fasta'

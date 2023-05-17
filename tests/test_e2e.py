@@ -2,7 +2,7 @@ from collage.runner import create_model
 from collage.constants import VALIDATION_FRACTION, RANDOM_SEED
 
 
-def test_end_to_end_training(tmp_path, unzipped_tiny_fasta_path):
+def test_end_to_end_training(tmp_path, ecoli10_path):
     '''
     Simple test to check that training the model does not crash.
     Does not check any correctness or peformance.
@@ -13,7 +13,7 @@ def test_end_to_end_training(tmp_path, unzipped_tiny_fasta_path):
     prefix = tmp_path / 'test'
 
     # Do a quick train of the model on the CPU with 10 epochs.
-    create_model(str(unzipped_tiny_fasta_path),
+    create_model(str(ecoli10_path),
                  str(prefix),
                  VALIDATION_FRACTION,
                  RANDOM_SEED,
