@@ -1,0 +1,2 @@
+# This file is for requirements used in both the CPU and CUDA versions
+numpy==1.24.3

@@ -1,9 +1,15 @@
 # CoLLAGE
-Codon Likelihoods Learned Against Genome Evolution (CoLLAGE): a deep learning framework for identifying naturally selected patterns of codon preference within a species
+Codon Likelihoods Learned Against Genome Evolution (CoLLAGE): a deep learning framework for identifying naturally selected patterns of codon preference within a species.
 
-## Tests
-Please run tests and ensure they pass before making a PR or pushing your code to main.
+## Using CoLLAGE
+### Web
+The easiest way to use CoLLAGE is through our free web service located at WEBSITE_URL_TBD. You simply need to upload your FASTA, and the website handles the rest!
 
+### Running locally
+If you would like to run CoLLAGE locally, please install the dependencies in either `cpu_requirements.txt` or `cuda_requirements.txt` depending on whether CUDA is available on your system.
+
+TODO(auberon): Add instructions on running scripts for CoLLAGE.
+=======
 ### Test Setup
 In addition to the needed dependencies for running CoLLAGE itself, please install `pytest`. Run one of the following commands depending on your package manager. (TODO(auberon): add requirements.txt(s))
 
@@ -14,9 +20,12 @@ pip install pytest
 conda install -c anaconda pytest
 ```
 
-### Running Tests
-Navigate to the root of the repository on the command line and run:
 
+TODO(auberon): Make package CoLLAGE for PyPI and make it pip installable.
+
+### Developing
+If you would like to contribute to the development of CoLLAGE, please see [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to install and set up your dev environment.
+=======
 ```
 pytest
 ```
@@ -50,3 +59,4 @@ If you are using VS Code, you may find it convenient to have the formatting auto
     ```
 1. Restart VS Code
 1. Check that it works by editing a Python file and adding a bunch of extra newlines to the end. When you save the file with `ctrl+s` it should remove the extra lines automatically!
+
