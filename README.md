@@ -10,7 +10,5 @@ If you would like to run CoLLAGE locally, please install the dependencies in eit
 
 TODO(auberon): Add instructions on running scripts for CoLLAGE.
 
-TODO(auberon): Make package CoLLAGE for PyPI and make it pip installable.
-
 ### Developing
 If you would like to contribute to the development of CoLLAGE, please see [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to install and set up your dev environment.
