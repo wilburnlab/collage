@@ -16,7 +16,7 @@ def read_fasta(file_name: str,
     seq_dict = {}
 
     if file_name[-3:] == '.gz':
-        fasta = gzip.open(file_name, 'rb')
+        fasta = gzip.open(file_name, 'rt')
     else:
         fasta = open(file_name, 'r')
 
