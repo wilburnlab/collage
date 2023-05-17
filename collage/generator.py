@@ -55,10 +55,10 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
             else:
                 coded_seqs.append([65] + [CODON_TO_INT[c] for c in s_codons])
         orf_tensor = torch.Tensor(coded_seqs).to(torch.int64)
-        prot_tensor = prot_tensor_0.repeat(orf_tensor.size(0), 1, )
+        prot_tensor = prot_tensor_0.repeat(orf_tensor.size(0), 1)
 
         weights_tensor = torch.ones(prot_tensor.shape)
-        output = model(prot_tensor, orf_tensor, )
+        output = model(prot_tensor, orf_tensor)
 
         logLs = output.cpu().detach().numpy()[:, -1, :]
         candidate_seqs = {}

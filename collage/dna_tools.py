@@ -96,7 +96,7 @@ def orf_searcher(dna_sequence: str,
         # Dump the records to the provided directory
         out_filename = sequence_name.replace('/', '_').replace('\\', '_') + '.pkl'
         out_path = os.path.join(dir, out_filename)
-        pickle.dump(records, open(out_path, 'wb', ))
+        pickle.dump(records, open(out_path, 'wb'))
         return None
 
 
@@ -126,7 +126,7 @@ def library_to_orf_records(sequence_library: dict,
         # library_elements = list( sequence_library.items() )
         # orf_records = [ ]
         # library_items = list( sequence_library.items() )
-        # for i in range( 0, len( library_items ), executor_batch_size, ):
+        # for i in range( 0, len( library_items ), executor_batch_size):
         #    print( i )
         #    batch = list( library_items[ i : i + executor_batch_size ] )
         # temp_dir = 'tmp' + str( round(time.time()) )
@@ -136,15 +136,15 @@ def library_to_orf_records(sequence_library: dict,
                                    min_length,
                                    both_strands,
                                    longest_only,
-                                   name, ) for name, sequence in sequence_library.items()]
+                                   name) for name, sequence in sequence_library.items()]
         concurrent.futures.wait(futures)
         # print( 'ORFs processed' )
         # record_files = os.listdir( temp_dir )
-        # record_sets = [ pickle.load( open( os.path.join( temp_dir, f ), 'rb', ) ) for f in record_files ]
+        # record_sets = [ pickle.load( open( os.path.join( temp_dir, f ), 'rb') ) for f in record_files ]
         # print( 'Files read' )
         # orf_records = [ x for x in record_sets ]
         # orf_records = [ x for f in record_files
-        #                for x in pickle.load( open( os.path.join( temp_dir, f ), 'rb', ) ) ]
+        #                for x in pickle.load( open( os.path.join( temp_dir, f ), 'rb') ) ]
 
         # shutil.rmtree( temp_dir )
 
@@ -168,7 +168,7 @@ def library_to_orf_records(sequence_library: dict,
                       for r in records if r['Strand'] == modal_strand]
             start_to_n = dict([(s, starts.count(s))
                               for s in sorted(set(starts))])
-            start_to_n = dict(sorted(start_to_n.items(), key=lambda x: x[1], reverse=True, ))
+            start_to_n = dict(sorted(start_to_n.items(), key=lambda x: x[1], reverse=True))
             modal_start = list(start_to_n)[0]
             # print( modal_start )
             modal_records = [r for r in records if r['Strand'] == modal_strand and r['Start_position'] == modal_start]
@@ -191,11 +191,11 @@ def library_scorer(model: nn.Module,
     '''
     Update ORF records to include CoLLAGE site scores
     '''
-    nllloss = nn.NLLLoss(reduction='none', )
+    nllloss = nn.NLLLoss(reduction='none')
 
     # Sort records based on length, longest first, work on copy
     orf_records = sorted(
-        orf_records, key=lambda x: x['Length'], reverse=True, )
+        orf_records, key=lambda x: x['Length'], reverse=True)
 
     # Loop over records to create batches with orf indices
     batches = []
@@ -239,8 +239,8 @@ def library_scorer(model: nn.Module,
     for batch in batches:
         prot, cds, weight, gene = [x.to(device) for x in batch]
         targets = cds[:, 1:]
-        pred = model(prot, cds[:, :-1], ).transpose(1, -1, )
-        logLs = -nllloss(pred, targets, ).detach().numpy()
+        pred = model(prot, cds[:, :-1]).transpose(1, -1)
+        logLs = -nllloss(pred, targets).detach().numpy()
 
         orf_idxs = gene.detach().flatten().numpy()
         for orf_idx, logL in zip(orf_idxs, logLs):

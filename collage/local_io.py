@@ -16,9 +16,9 @@ def read_fasta(file_name: str,
     seq_dict = {}
 
     if file_name[-3:] == '.gz':
-        fasta = gzip.open(file_name, 'rb', )
+        fasta = gzip.open(file_name, 'rb')
     else:
-        fasta = open(file_name, 'r', )
+        fasta = open(file_name, 'r')
 
     for line in fasta:
         if line[0] == '>':  # New seq
@@ -62,7 +62,7 @@ def write_fasta(seq_dict: dict,
     else:  # append mode
         write_mode = 'a' if os.path.isfile(file_name) else 'w'
 
-    file_out = open(file_name, write_mode, )
+    file_out = open(file_name, write_mode)
 
     for name, seq in seq_dict.items():
         file_out.write('>' + name + '\n' + seq + '\n')

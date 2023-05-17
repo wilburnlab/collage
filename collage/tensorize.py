@@ -23,7 +23,7 @@ def split_train_test_data(processed_data: list,
 def records_to_tensors( records: list,
                         start_idx: int,
                         end_idx: int,
-                        max_len: int, ) -> tuple:
+                        max_len: int) -> tuple:
 
     assert end_idx - start_idx <= max_len, 'End index exceeds max length in sequence slice'
 
@@ -35,7 +35,7 @@ def records_to_tensors( records: list,
                         for r in records ]
     protein_tensor = torch.Tensor( padded_proteins ).to( torch.int64 )
 
-    return ( protein_tensor, orf_tensor, )
+    return ( protein_tensor, orf_tensor)
 '''
 
 
@@ -98,7 +98,7 @@ def records_to_batches(records: list,
                        batch_size: int,
                        randomize_order: bool,
                        randomize_start: bool,
-                       by_gene: bool, ) -> list:
+                       by_gene: bool) -> list:
     '''
     Records to batches for training
     '''

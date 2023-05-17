@@ -40,7 +40,7 @@ class ProtEncoder(nn.Module):
     def __init__(self, n_tokens, embed_dim, ff_dim, n_heads, n_layers, dropout, max_len):
         super().__init__()
         self.embed_dim = embed_dim
-        self.prot_embedding = nn.Embedding(n_tokens, embed_dim, )
+        self.prot_embedding = nn.Embedding(n_tokens, embed_dim)
         self.encoder_layer = nn.TransformerEncoderLayer(embed_dim,
                                                         n_heads,
                                                         ff_dim,
@@ -49,7 +49,7 @@ class ProtEncoder(nn.Module):
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, n_layers)
         self.pos_encoder = PositionalEncoding(embed_dim, dropout, max_len)
 
-    def forward(self, prot, ):  # sp, ):
+    def forward(self, prot):  # sp):
         pad_mask = (prot == 0).to(prot.device)
         x = self.prot_embedding(prot) * math.sqrt(self.embed_dim)
         x = self.pos_encoder(x)
@@ -118,14 +118,14 @@ class CollageModel(nn.Module):
         nn.init.constant_(self.linear.bias, -math.log(64.0 - 1))
         self.softmax = nn.LogSoftmax(dim=-1)
 
-    def return_codon_mask(self, protein, ):
+    def return_codon_mask(self, protein):
         codon_mask = self.codon_masker(protein)
         return torch.where(codon_mask != 0, 0.0, -torch.inf)
 
-    def forward(self, protein, cds, ):
+    def forward(self, protein, cds):
         codon_mask = self.return_codon_mask(protein)
 
-        x = self.protein_encoder(protein, )
+        x = self.protein_encoder(protein)
         x = self.codon_decoder(protein, cds, x)
         x = self.linear(x)
 
