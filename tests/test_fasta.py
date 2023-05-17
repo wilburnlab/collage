@@ -1,3 +1,4 @@
+from pathlib import Path
 import pytest
 from typing import Dict
 from collage.fasta import read_fasta
@@ -48,4 +49,14 @@ def test_read_fasta_creates_valid_seq_dict_for_zipped_tiny_data(
 
     mocker.patch('gzip.open', tiny_fasta_file_contents)
     actual = read_fasta('tiny.fasta.gz', True)
+    assert tiny_fasta_seq_dict == actual
+
+
+def test_read_fasta_works_with_path_object(
+        tiny_fasta_file_contents,
+        tiny_fasta_seq_dict: Dict[str, str],
+        mocker: MockFixture):
+
+    mocker.patch('gzip.open', tiny_fasta_file_contents)
+    actual = read_fasta(Path('tiny.fast.gz'), True)
     assert tiny_fasta_seq_dict == actual

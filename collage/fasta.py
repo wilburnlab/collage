@@ -2,23 +2,24 @@
 Local I/O Functions
 '''
 import gzip
+from pathlib import Path
 from collage.utils import identify_alphabet
 
 
-def read_fasta(file_name: str,
+def read_fasta(file_name: str | Path,
                first_word: bool,
                override_alphabet_check: bool = False) -> dict:
     '''
     Return dict with keys = names, values = sequences
     '''
+    file_name = Path(file_name)
 
-    # Read in sequences
-    seq_dict = {}
-
-    if file_name[-3:] == '.gz':
+    if file_name.suffix == '.gz':
         fasta = gzip.open(file_name, 'rt')
     else:
         fasta = open(file_name, 'r')
+
+    seq_dict = {}
 
     for line in fasta:
         if line[0] == '>':  # New seq
@@ -45,7 +46,6 @@ def read_fasta(file_name: str,
     # if alphabet == 'DNA':
     #    seq_dict = dict( [ x for x in seq_dict.items() if set( x[1] ) <= set( nucleotides ) ] )
 
-    # Return seq dict
     return seq_dict
 
 
