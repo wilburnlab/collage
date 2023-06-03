@@ -13,3 +13,8 @@ def test_data_path() -> Path:
 def ecoli10_path(test_data_path: Path) -> Path:
     '''Path to a small fasta file with 10 ecoli sequences'''
     return test_data_path / 'ecoli10.fasta'
+
+
+@pytest.fixture
+def ecoli_model_path(test_data_path: Path) -> Path:
+    return test_data_path / 'Ecoli.pt'
