@@ -21,8 +21,7 @@ class WeightedLikelihood(nn.Module):
         obs_codons: tensor of size (batch_size,seq_len)
         '''
 
-        neg_logLs = self.nllloss(logprob_by_codon.transpose(1, -1),
-                                 obs_codons)  # Should be size ( B, L )
+        neg_logLs = self.nllloss(logprob_by_codon.transpose(1, -1), obs_codons)  # Should be size ( B, L )
         mask = neg_logLs != 0.0
         loss = torch.sum(weight * neg_logLs) / torch.sum(weight * mask)
 
@@ -35,7 +34,7 @@ def calc_accuracy(targets: torch.Tensor,
     For a given set of targets and a probability matrix, calculate the accuracy
     '''
 
-    max_logLs, max_idx_class = log_probabilities.max(dim=-1)  # [ B, n_classes ] -> [ B ]
+    _, max_idx_class = log_probabilities.max(dim=-1)  # [ B, n_classes ] -> [ B ]
     n = targets.flatten().size(0)
     accuracy = torch.sum(max_idx_class == targets).item() / n
     return accuracy

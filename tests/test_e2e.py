@@ -1,5 +1,5 @@
 from collage.runner import create_model
-from collage.constants import VALIDATION_FRACTION, RANDOM_SEED
+from collage.defaults import RANDOM_SEED, VALIDATION_FRACTION
 
 
 def test_end_to_end_training(tmp_path, ecoli10_path):

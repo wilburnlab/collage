@@ -4,9 +4,8 @@ Train CoLLAGE Script
 import sys
 import argparse
 
-import collage.constants as constants
 from collage.runner import create_model
-from collage.settings import TRAINING_PARAMETERS
+from collage.defaults import TRAINING_PARAMETERS, VALIDATION_FRACTION, RANDOM_SEED
 
 
 def parse_args(args: list):
@@ -28,13 +27,13 @@ def parse_args(args: list):
                         type=float,
                         help='Fraction of data to withhold for model evaluation' +
                         '\n\tDefault: ' +
-                        format(constants.VALIDATION_FRACTION, '.2f'),
-                        default=constants.VALIDATION_FRACTION)
+                        format(VALIDATION_FRACTION, '.2f'),
+                        default=VALIDATION_FRACTION)
     parser.add_argument('--random_seed',
                         type=int,
                         help='Random seed for splitting training vs evaluation data' +
-                        '\n\tDefault: ' + str(constants.RANDOM_SEED),
-                        default=constants.RANDOM_SEED)
+                        '\n\tDefault: ' + str(RANDOM_SEED),
+                        default=RANDOM_SEED)
     parser.add_argument('--gpu',
                         action='store_true',
                         help='Use GPU (CUDA) for CoLLAGE training')
