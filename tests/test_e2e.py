@@ -45,11 +45,11 @@ def test_end_to_end_training_and_generation(tmp_path, ecoli10_path):
 
     model.load_state_dict(state_dict)
 
-    protien = '.PASTA'
+    protein = '.PASTA'
 
     # TODO(auberon): Assert something about the output?
     # For now just checks that it doesn't crash
-    beam_generator(model, protien)
+    beam_generator(model, protein)
 
 
 def test_end_to_end_pretrained_generation(ecoli_model_path):
