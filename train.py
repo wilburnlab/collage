@@ -13,7 +13,7 @@ def parse_args(args: list):
     Read in arguments
     '''
 
-    parser = argparse.ArgumentParser(usage='Train_CoLLAGE.py [optional arguments] input.fasta output_prefix',
+    parser = argparse.ArgumentParser(usage='train.py [optional arguments] input.fasta output_prefix',
                                      description='Train a CoLLAGE codon likelihood model from a provided FASTA '
                                      'input of coding sequences.',
                                      formatter_class=argparse.RawTextHelpFormatter)
