@@ -10,5 +10,12 @@ If you would like to run CoLLAGE locally, please install the dependencies in eit
 
 TODO(auberon): Add instructions on running scripts for CoLLAGE.
 
+### Running the Docker image
+TODO(auberon): give full instructions
+Input file must be named input.fasta. TODO(auberon): remove this limitation.
+```
+docker run -v /absolute/path/to/input/folder:/input redcliffesalaman/collage-model
+```
+
 ### Developing
 If you would like to contribute to the development of CoLLAGE, please see [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to install and set up your dev environment.
