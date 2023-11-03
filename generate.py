@@ -61,6 +61,8 @@ def predict_and_save(input_path, weights_path, output_path, beam_size, gpu):
     with open(output_path, 'w') as file:
         file.write(str(predictions))
 
+    print(predictions)
+
 
 def main():
     args = parse_args(sys.argv[1:])
