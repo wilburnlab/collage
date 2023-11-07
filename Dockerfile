@@ -7,12 +7,14 @@ RUN pip install -r /requirements/requirements.txt
 
 RUN mkdir /output
 
+ENV PYTHONPATH "${PYTHONPATH}:/src/"
+
 COPY ./models /models
-COPY ./collage /collage
-COPY ./generate.py /generate.py
+COPY ./collage /src/collage
+COPY ./generate.py /scripts/generate.py
 
 # Expect user to mount input fasta to /input/input.fasta
 # TODO(auberon): Docker-specific error message if they don't?
 
 # TODO(auberon): Allow user to set model easily
-ENTRYPOINT ["python", "/generate.py", "/input/input.fasta", "/models/Ecoli.pt", "/output/preds"]
+ENTRYPOINT ["python", "/scripts/generate.py", "/input/input.fasta", "/models/Ecoli.pt", "/output/preds"]

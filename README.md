@@ -14,7 +14,12 @@ TODO(auberon): Add instructions on running scripts for CoLLAGE.
 TODO(auberon): give full instructions
 Input file must be named input.fasta. TODO(auberon): remove this limitation.
 ```
-docker run -v /absolute/path/to/input/folder:/input redcliffesalaman/collage-model
+docker run -v /absolute/path/to/input/folder:/input -v /absolute/path/to/output/folder:/output redcliffesalaman/collage-model
+```
+
+Hint: to get an absolute path of a folder in your current working directory, you can use:
+```
+$(pwd)/my_relative_folder
 ```
 
 ### Developing
