@@ -3,6 +3,8 @@ Local I/O Functions
 '''
 import gzip
 from pathlib import Path
+from typing import TextIO
+
 from collage.utils import identify_alphabet
 
 
@@ -49,7 +51,7 @@ def validate_seq_dict(seq_dict, override_alphabet_check: bool = False):
     #    seq_dict = dict( [ x for x in seq_dict.items() if set( x[1] ) <= set( nucleotides ) ] )
 
 
-def parse_fasta(file_data, first_word: bool):
+def parse_fasta(file_data: TextIO, first_word: bool):
     seq_dict = {}
 
     for line in file_data:
