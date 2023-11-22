@@ -1,7 +1,8 @@
 import torch
 
 from collage.defaults import RANDOM_SEED, VALIDATION_FRACTION, HYPERPARAMETERS, TRAINING_PARAMETERS
-from collage.generator import beam_generator
+from collage.fasta import read_fasta, write_fasta
+from collage.generator import beam_generator, seq_scores_to_seq_dict
 from collage.model import CollageModel
 from collage.runner import create_model
 
@@ -17,6 +18,7 @@ def test_end_to_end_training_and_generation(tmp_path, ecoli10_path):
 
     # Temp location to store output
     prefix = tmp_path / 'test'
+    output_file = tmp_path / 'output.fasta'
 
     # Do a quick train of the model on the CPU with 10 epochs.
     create_model(str(ecoli10_path),
@@ -47,12 +49,16 @@ def test_end_to_end_training_and_generation(tmp_path, ecoli10_path):
 
     protein = '.PASTA'
 
-    # TODO(auberon): Assert something about the output?
-    # For now just checks that it doesn't crash
-    beam_generator(model, protein)
+    seq_scores = beam_generator(model, protein)
+    seq_dict = seq_scores_to_seq_dict(seq_scores)
+
+    write_fasta(seq_dict, output_file)
+    read_seqs = read_fasta(output_file, False)
+
+    assert seq_dict == read_seqs
 
 
-def test_end_to_end_pretrained_generation(ecoli_model_path):
+def test_end_to_end_pretrained_generation(tmp_path, ecoli_model_path):
     '''
     Tests sequence generation against a fully trained model.
     Currently used to validate that model does not deviate
@@ -60,6 +66,8 @@ def test_end_to_end_pretrained_generation(ecoli_model_path):
     there is better unit testing, as this should be largely covered
     by the fuller e2e test.
     '''
+
+    output_file = tmp_path / 'output.fasta'
 
     state_dict = torch.load(ecoli_model_path, map_location=torch.device('cpu'))
     model = CollageModel(HYPERPARAMETERS['n_input_tokens'],
@@ -73,8 +81,12 @@ def test_end_to_end_pretrained_generation(ecoli_model_path):
                          HYPERPARAMETERS['max_sequence_length'])
     model.load_state_dict(state_dict)
 
-    protien = '.PASTA'
+    protein = '.PASTA'
 
-    # TODO(auberon): Assert something about the output?
-    # For now just checks that it doesn't crash
-    beam_generator(model, protien)
+    seq_scores = beam_generator(model, protein)
+    seq_dict = seq_scores_to_seq_dict(seq_scores)
+
+    write_fasta(seq_dict, output_file)
+    read_seqs = read_fasta(output_file, False)
+
+    assert seq_dict == read_seqs

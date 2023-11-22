@@ -66,23 +66,24 @@ def parse_fasta(file_data: TextIO, first_word: bool):
     return seq_dict
 
 
+def to_fasta(seq_dict: dict) -> str:
+    '''
+    Converts a sequence dictionary to a string in the FASTA format.
+    Lines are separated with UNIX-stye line endings and a trailing newline
+    is included.
+    '''
+    return '\n'.join(f'>{name}\n{seq}' for name, seq in seq_dict.items()) + '\n'
+
+
 def write_fasta(seq_dict: dict,
-                file_name: str,
+                file_name: Path | str,
                 append: bool = True) -> None:
     '''
     Write a sequence dictionary to FASTA file, defaults to append rather than overwrite.
     In append mode, will create a new file first if it doesn't already exist
     '''
 
-    if append == False:  # overwrite mode
-        write_mode = 'w'
-    else:  # append mode
-        write_mode = 'a' if os.path.isfile(file_name) else 'w'
+    write_mode = 'a+' if append else 'w'
 
-    file_out = open(file_name, write_mode)
-
-    for name, seq in seq_dict.items():
-        file_out.write('>' + name + '\n' + seq + '\n')
-
-    file_out.close()
-    return None
+    with open(file_name, write_mode) as f:
+        f.write(to_fasta(seq_dict))

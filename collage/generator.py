@@ -76,6 +76,17 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
     return current_seqs
 
 
+def seq_scores_to_seq_dict(seq_scores):
+    '''
+    Takes a dictionary of form {dna_sequence : negLL}
+    and transforms it to {sequence_description : dna_sequence}
+    '''
+    return {
+        f"seq{i}: negLL: {negLL}": seq
+        for i, (seq, negLL) in enumerate(seq_scores.items())
+    }
+
+
 def seq_scorer(model, cds, gen_size=500):
 
     s_codons = re.findall('...', cds)
