@@ -5,8 +5,8 @@ import argparse
 from pathlib import Path
 import sys
 
-from collage.fasta import read_fasta
-from collage.generator import beam_generator
+from collage.fasta import read_fasta, write_fasta
+from collage.generator import beam_generator, seq_scores_to_seq_dict
 from collage.model import initialize_collage_model
 
 
@@ -56,12 +56,10 @@ def predict_and_save(input_path, weights_path, output_path, beam_size, gpu):
     # TODO(auberon): Make predicitions for multiple proteins?
     first_protein = list(proteins.values())[0]
     model = initialize_collage_model(weights_path, gpu)
-    predictions = beam_generator(model, first_protein, max_seqs=beam_size)
+    negLLs = beam_generator(model, first_protein, max_seqs=beam_size)
+    seq_dict = seq_scores_to_seq_dict(negLLs)
 
-    with open(output_path, 'w') as file:
-        file.write(str(predictions))
-
-    print(predictions)
+    write_fasta(seq_dict, output_path, False)
 
 
 def main():
