@@ -48,7 +48,7 @@ def predict_and_save(input_path, weights_path, output_path, beam_size, gpu):
     input_path, weights_path = Path(input_path), Path(weights_path)
     for path in (input_path, weights_path):
         if not path.exists():
-            raise FileNotFoundError(f"File '{input_path}' not found")
+            raise FileNotFoundError(f"File '{path}' not found")
 
     proteins = read_fasta(input_path, True)
 
