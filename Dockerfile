@@ -1,8 +1,6 @@
-FROM pytorch/pytorch 
-#TODO(auberon) pin to specific image version?
+FROM pytorch/pytorch:2.1.1-cuda12.1-cudnn8-runtime
 
-# TODO(auberon) Maintain separate docker images for CPU/GPU versions
-COPY ./cpu_requirements.txt /requirements/requirements.txt
+COPY ./tools/requirements/shared_requirements.txt /requirements/requirements.txt
 RUN pip install -r /requirements/requirements.txt
 
 RUN mkdir /output
@@ -17,4 +15,4 @@ COPY ./generate.py /scripts/generate.py
 # TODO(auberon): Docker-specific error message if they don't?
 
 # TODO(auberon): Allow user to set model easily
-ENTRYPOINT ["python", "/scripts/generate.py", "/input/input.fasta", "/models/Ecoli.pt", "/output/preds"]
+ENTRYPOINT ["python", "/scripts/generate.py", "/input/input.fasta", "/models/Ecoli.pt", "/output/preds.fasta"]
