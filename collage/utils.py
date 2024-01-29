@@ -4,7 +4,7 @@ import datetime
 import math
 import numpy as np
 
-from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
+from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, NUCLEOTIDE_TO_INT, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
 
 CODED_CODONS = [CODON_TO_INT[c] for c in CODONS[1:65]]
 
@@ -58,6 +58,9 @@ def len_check(sequence: str,
     '''
     seq_len = len(sequence)
     return seq_len >= min_len and seq_len <= max_len
+
+def nt_to_coded(orf: str) -> list:
+    return [NUCLEOTIDE_TO_INT[n] for n in orf]
 
 
 def orf_to_coded(orf: str,
@@ -140,6 +143,7 @@ def dna_dictionary_to_records(dna_dict: dict,
     for seq_name in dna_dict:
         record = {'Ensembl_ID': seq_name,
                   'ORF': dna_dict[seq_name], }
+        record['NT_coded'] = nt_to_coded(record['ORF'])
         record['ORF_coded'] = orf_to_coded(record['ORF'], True)
         prot = translate(record['ORF'])
         if orf_check(prot) and len_check(prot, min_aa, max_aa):

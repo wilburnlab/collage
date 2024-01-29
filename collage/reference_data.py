@@ -1,6 +1,7 @@
 import numpy as np
 
 NUCLEOTIDES = ['-', 'A', 'T', 'C', 'G']
+NUCLEOTIDE_TO_INT = dict(zip(NUCLEOTIDES, range(len(NUCLEOTIDES))))
 
 CODON_TO_RESIDUE = {'---': '-',
                     'TTT': 'F', 'TCT': 'S', 'TAT': 'Y', 'TGT': 'C',

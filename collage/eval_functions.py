@@ -38,3 +38,6 @@ def calc_accuracy(targets: torch.Tensor,
     n = targets.flatten().size(0)
     accuracy = torch.sum(max_idx_class == targets).item() / n
     return accuracy
+
+
+class PenalizedLikelihood(nn.Module)
