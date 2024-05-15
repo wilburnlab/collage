@@ -34,13 +34,16 @@ def parse_args(args: list):
     parser.add_argument('--gpu',
                         action='store_true',
                         help='Use GPU (CUDA) for CoLLAGE training')
+    parser.add_argument('--check_gc',
+                        action='store_true',
+                        help='Whether to filter out candidate sequences that have >65% GC content')
 
     return parser.parse_args(args)
 
 # TODO(auberon) Move this inside package?
 
 
-def predict_and_save(input_path, weights_path, output_path, beam_size, gpu):
+def predict_and_save(input_path, weights_path, output_path, beam_size, gpu, check_gc):
     '''
     Uses given model weights to predict the first protein specified in a given FASTA
     and saves the results to a given file location.
@@ -56,7 +59,7 @@ def predict_and_save(input_path, weights_path, output_path, beam_size, gpu):
     # TODO(auberon): Make predicitions for multiple proteins?
     first_protein = list(proteins.values())[0]
     model = initialize_collage_model(weights_path, gpu)
-    negLLs = beam_generator(model, first_protein, max_seqs=beam_size)
+    negLLs = beam_generator(model, first_protein, max_seqs=beam_size, check_gc=check_gc)
     seq_dict = seq_scores_to_seq_dict(negLLs)
 
     write_fasta(seq_dict, output_path, False)
