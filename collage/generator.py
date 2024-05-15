@@ -22,7 +22,7 @@ def gc_100_check(seq):
     return np.any(exceptions)
 
 
-def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
+def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, check_gc=False):
     assert len(
         pre_sequence) % 3 == 0, 'Start sequence length is not a multiple of 3'
 
@@ -66,7 +66,7 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
             codon_logL = dict([(c, l) for c, l in zip(
                 CODONS, logLs[j]) if np.isfinite(l)])
             for c in codon_logL:
-                if gc_100_check(seq + c):
+                if check_gc and gc_100_check(seq + c):
                     continue  # Avoid >65% GC
                 candidate_seqs[seq + c] = current_seqs[seq] + codon_logL[c]
 
