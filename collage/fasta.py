@@ -39,10 +39,12 @@ def validate_seq_dict(seq_dict, override_alphabet_check: bool = False):
         observed_alphabets = set([identify_alphabet(s)
                                  for s in seq_dict.values()])
 
-        # TODO(auberon): convert these to FileContentsError
-        assert 'Unknown' not in observed_alphabets, 'Unknown characters in FASTA file'
-        assert len(
-            observed_alphabets) == 1, 'Both DNA and Protein sequences in FASTA file'
+        if 'Unknown' in observed_alphabets:
+            raise FileContentsError('Unknown characters in FASTA file')
+
+        if len(observed_alphabets) != 1:
+            raise FileContentsError('Both DNA and Protein sequences in FASTA file')
+
         alphabet = list(observed_alphabets)[0]
 
     # TODO(auberon): Check with Damien whether this can be

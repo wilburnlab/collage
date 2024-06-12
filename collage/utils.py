@@ -32,7 +32,8 @@ def translate(sequence: str) -> str:
     '''
 
     observed_alphabet = identify_alphabet(sequence)
-    assert observed_alphabet == 'DNA', 'Attempted to translate non-DNA sequence: ' + sequence
+    if observed_alphabet != 'DNA':
+        raise ValueError(f'Attempted to translate non-DNA sequence: "{sequence}"')
 
     dna_sequence = sequence.strip().upper()
     if len(dna_sequence) < 3:
