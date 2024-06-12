@@ -23,8 +23,8 @@ def gc_100_check(seq):
 
 
 def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, check_gc=False):
-    assert len(
-        pre_sequence) % 3 == 0, 'Start sequence length is not a multiple of 3'
+    if len(pre_sequence) % 3 != 0:
+        raise ValueError('Start sequence length is not a multiple of 3')
 
     prot_prefix = translate(pre_sequence)
     prot_prefix_len = len(prot_prefix)

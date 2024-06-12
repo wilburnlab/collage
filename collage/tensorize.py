@@ -49,7 +49,8 @@ def record_slice_to_arrays(record: dict,
     '''
 
     seq_len = end_idx - start_idx
-    assert seq_len <= max_len, 'End index exceeds max length in sequence slice'
+    if seq_len > max_len:
+        raise ValueError('End index exceeds max length in sequence slice')
 
     padded_orf = record['ORF_coded'][start_idx: end_idx + 1] + [0] * (max_len - seq_len)
     padded_protein = record['Translation_coded'][start_idx: end_idx] + [0] * (max_len - seq_len)
