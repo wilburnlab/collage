@@ -25,6 +25,27 @@ This should automatically find all tests and run them. You should expect to see 
 
 If the tests fail, please make sure to either fix your code or update the tests before opening a PR / pushing your code.
 
+## Code coverage
+To generate a code coverage report on the command line, run
+
+```
+pytest --cov=collage tests/
+```
+
+This will show the percentage of covered lines per file.
+
+To inspect this further, you can generate an HTML report that will show which lines are uncovered. Generate the HTML report using the below:
+
+```
+pytest --cov=collage tests/ --cov-report html:cov_html
+```
+
+The report will be stored in a new cov_html directory. You can view it by running
+```
+python -m http.server
+```
+And then visiting [http://0.0.0.0:8000/cov_html](http://0.0.0.0:8000/cov_html)
+
 ## Formatting
 We use the `autopep8` formatter. Please format your code before making PRs or pushing to main. We supply the following addtional arguments to ignore line length limits:
 ```
