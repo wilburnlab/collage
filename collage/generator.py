@@ -1,5 +1,8 @@
 
+from math import ceil
+from collections.abc import Iterable
 import re
+
 import numpy as np
 import torch
 
@@ -8,18 +11,46 @@ from collage.utils import prot_to_coded
 from collage.reference_data import RESIDUE_TO_INT, CODON_TO_INT, CODONS
 
 
-# Let's write a test beam generator function
+def exceeds_gc(seq: Iterable[str], window_size: int = 100, fraction: float = .65):
+    '''Checks whether the GC fraction heuristic is violated in a sequence.
 
-current_species = ['Ecoli_K12']
+    This function returns True if any subsequence of the given size (window_size) within
+    the input sequence (seq) has a GC content at or above the specified
+    maximum fraction (fraction). 
 
+    Parameters:
+    - seq (Iterable[str]): The input sequence of nucleotide bases (strings 'A', 'T', 'G', 'C').
+    - window_size (int, optional): The size of the sliding window to check for GC content. 
+      Defaults to 100.
+    - fraction (float, optional): The fraction of G or C bases within any window at or above which
+      will be considered excessive. Defaults to 0.65.
 
-def gc_100_check(seq):
-    # Convert the sequence to GC code
-    gc = [b in ['C', 'G'] for b in seq]
-    slices = [gc[i: i + 100] for i in range(0, len(gc), 100)]
-    percents = [np.mean(s) for s in slices]
-    exceptions = [p >= 0.65 for p in percents]
-    return np.any(exceptions)
+    Returns:
+    - bool: True if any subsequence of the specified window_size has a GC fraction greater
+      than or equal to fraction, otherwise False.
+
+    Special Case:
+    If the sequence length is less than the window_size, the function checks if it is 
+    impossible for the sequence to meet the constraint even when padded. For example,
+    with a window_size of 6 and a fraction of 0.5, the sequence 'GCGC' would return 
+    True because regardless of the additional two bases appended it cannot meet the 
+    required fraction for the window size.
+
+    This heuristic is intended to flag sequences that may be challenging to synthesize
+    due to high GC content.
+
+    '''
+    max_count = ceil(window_size * fraction)
+    count = 0
+
+    for i in range(len(seq)):
+        count += int(seq[i] in 'GC')
+        if i >= window_size:
+            count -= int(seq[i - window_size] in 'GC')
+        if count >= max_count:
+            return True
+
+    return False
 
 
 def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, check_gc=False):
@@ -66,7 +97,7 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, che
             codon_logL = dict([(c, l) for c, l in zip(
                 CODONS, logLs[j]) if np.isfinite(l)])
             for c in codon_logL:
-                if check_gc and gc_100_check(seq + c):
+                if check_gc and exceeds_gc(seq + c):
                     continue  # Avoid >65% GC
                 candidate_seqs[seq + c] = current_seqs[seq] + codon_logL[c]
 

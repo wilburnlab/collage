@@ -47,9 +47,9 @@ def test_end_to_end_training_and_generation(tmp_path, ecoli10_path):
 
     model.load_state_dict(state_dict)
 
-    protein = '.PASTA'
+    protein = 'PASTA'
 
-    seq_scores = beam_generator(model, protein)
+    seq_scores = beam_generator(model, protein, check_gc=True)
     seq_dict = seq_scores_to_seq_dict(seq_scores)
 
     write_fasta(seq_dict, output_file)
