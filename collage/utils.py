@@ -30,7 +30,9 @@ def identify_alphabet(sequence: str) -> str:
 
 def translate(sequence: str) -> str:
     '''
-    Translate DNA sequence to protein
+    Translate DNA sequence to protein.
+
+    If the length of the sequence is not a multiple of 3, any trailing bases are discarded.
     '''
 
     observed_alphabet = identify_alphabet(sequence)
@@ -48,7 +50,13 @@ def translate(sequence: str) -> str:
 
 def orf_check(prot: str) -> bool:
     '''
-    Check if a protein sequence is a perfect start->stop with no ambiguous characters
+    Check if a protein sequence is a perfect start->stop with no ambiguous characters.
+
+    In particular, it checks that the sequence:
+    - starts with M (start codon)
+    - ends with . (stop codon)
+    - has exactly one .
+    - has no X (unspecified)
     '''
     return prot[0] == 'M' and prot[-1] == '.' and prot.count('.') == 1 and prot.count('X') == 0
 
@@ -65,6 +73,12 @@ def len_check(sequence: str,
 
 def orf_to_coded(orf: str,
                  add_start: bool = False) -> List[int]:
+    '''
+    Convert a string of DNA into integer coded list representing the codon sequence.
+
+    If the length of the sequence is not a multiple of 3, any trailing bases are discarded.
+    If add_start is True, a special start of sequence (65) code is prepended.
+    '''
     codons = re.findall('...', orf)
     coded = [CODON_TO_INT[c] for c in codons]
     if add_start:
@@ -73,6 +87,9 @@ def orf_to_coded(orf: str,
 
 
 def prot_to_coded(prot: str) -> List[int]:
+    '''
+    Convert a string of amino acids into integer coded list representing the AA sequence.
+    '''
     return [RESIDUE_TO_INT[r] for r in prot]
 
 
