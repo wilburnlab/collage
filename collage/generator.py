@@ -57,38 +57,50 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, che
     if len(pre_sequence) % 3 != 0:
         raise ValueError('Start sequence length is not a multiple of 3')
 
+    # The prefix sequence translated to a protein
     prot_prefix = translate(pre_sequence)
     prot_prefix_len = len(prot_prefix)
 
+    # The prefix sequence along with the protein to predict
     full_prot = translate(pre_sequence) + prot
     full_prot_len = len(full_prot)
 
+    # Holds the current candidate sequences as DNA base strings
+    # Begins with the inial prefix only
     current_seqs = {pre_sequence: 0.0}
 
-    # start_codons = re.findall( '...', start )
-    # start_coded = [ 65 ] + [ codon_to_int[ c ] for c in start_codons ]
-    # orf_tensor = torch.Tensor( [ start_coded ] ).to( torch.int64 )
-
+    # For each of the codons to predict (do not predict codons for the pre-sequence)
     for i in range(prot_prefix_len, full_prot_len):
+        # Predict no more than gen_size codons at a time
         if i < gen_size:
             prot_seq = full_prot[: gen_size]
         else:
             prot_seq = full_prot[i - gen_size + 1: i + 1]
+
+        # Convert sequence to integer code
+        # TODO(auberon): This can just be done once at the beginning
         prot_coded = prot_to_coded(prot_seq)
         prot_tensor_0 = torch.tensor([prot_coded]).to(torch.int64)
 
         coded_seqs = []
         for seq in current_seqs:
+            # Split sequence into groups of 3, discarding any trailing 1 or two bases
             s_codons = re.findall('...', seq)
+            # If there are more codons than the gen size, only include the last gen_size of them
             if len(s_codons) >= gen_size:
                 coded_seqs.append([CODON_TO_INT[c]
                                   for c in s_codons[-gen_size:]])
+            # Otherwise include the whole thing with a start of sequence symbol prepended
             else:
                 coded_seqs.append([65] + [CODON_TO_INT[c] for c in s_codons])
+
+        # Create a [num_seq, seq_len] tensor with the current codons for each sequence
         orf_tensor = torch.Tensor(coded_seqs).to(torch.int64)
+        # Create a [num_seq, min(gen_size, num_total_residues)] tensor
+        # Contains the residues repeated
         prot_tensor = prot_tensor_0.repeat(orf_tensor.size(0), 1)
 
-        weights_tensor = torch.ones(prot_tensor.shape)
+        # weights_tensor = torch.ones(prot_tensor.shape)
         output = model(prot_tensor, orf_tensor)
 
         logLs = output.cpu().detach().numpy()[:, -1, :]

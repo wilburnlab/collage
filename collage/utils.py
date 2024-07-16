@@ -4,7 +4,9 @@ import datetime
 import math
 import numpy as np
 
-from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
+from typing import List
+
+from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK_DEPRECATED
 
 CODED_CODONS = [CODON_TO_INT[c] for c in CODONS[1:65]]
 
@@ -28,7 +30,9 @@ def identify_alphabet(sequence: str) -> str:
 
 def translate(sequence: str) -> str:
     '''
-    Translate DNA sequence to protein
+    Translate DNA sequence to protein.
+
+    If the length of the sequence is not a multiple of 3, any trailing bases are discarded.
     '''
 
     observed_alphabet = identify_alphabet(sequence)
@@ -46,7 +50,13 @@ def translate(sequence: str) -> str:
 
 def orf_check(prot: str) -> bool:
     '''
-    Check if a protein sequence is a perfect start->stop with no ambiguous characters
+    Check if a protein sequence is a perfect start->stop with no ambiguous characters.
+
+    In particular, it checks that the sequence:
+    - starts with M (start codon)
+    - ends with . (stop codon)
+    - has exactly one .
+    - has no X (unspecified)
     '''
     return prot[0] == 'M' and prot[-1] == '.' and prot.count('.') == 1 and prot.count('X') == 0
 
@@ -62,7 +72,13 @@ def len_check(sequence: str,
 
 
 def orf_to_coded(orf: str,
-                 add_start: bool = False) -> list:
+                 add_start: bool = False) -> List[int]:
+    '''
+    Convert a string of DNA into integer coded list representing the codon sequence.
+
+    If the length of the sequence is not a multiple of 3, any trailing bases are discarded.
+    If add_start is True, a special start of sequence (65) code is prepended.
+    '''
     codons = re.findall('...', orf)
     coded = [CODON_TO_INT[c] for c in codons]
     if add_start:
@@ -70,7 +86,10 @@ def orf_to_coded(orf: str,
     return coded
 
 
-def prot_to_coded(prot: str) -> list:
+def prot_to_coded(prot: str) -> List[int]:
+    '''
+    Convert a string of amino acids into integer coded list representing the AA sequence.
+    '''
     return [RESIDUE_TO_INT[r] for r in prot]
 
 
@@ -95,8 +114,8 @@ def calc_codon_weights(sequence_dict: dict,
     codon_array = codon_counts_in_library(sequence_dict)
     if aa_normalize:
         norm_codon_array = np.zeros(codon_array.shape)
-        for r in RESIDUE_TO_CODON_MASK:
-            residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
+        for r in RESIDUE_TO_CODON_MASK_DEPRECATED:
+            residue_counts = codon_array * RESIDUE_TO_CODON_MASK_DEPRECATED[r]
             norm_counts = residue_counts / np.sum(residue_counts)
             norm_codon_array += norm_counts
         # codon_array =
@@ -119,8 +138,8 @@ def codedorf_to_weights(orf_coded: list,
 def calc_null_codon_logL(sequence_dict: dict) -> dict:
     codon_array = codon_counts_in_library(sequence_dict)
     norm_codon_array = np.zeros(codon_array.shape)
-    for r in RESIDUE_TO_CODON_MASK:
-        residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
+    for r in RESIDUE_TO_CODON_MASK_DEPRECATED:
+        residue_counts = codon_array * RESIDUE_TO_CODON_MASK_DEPRECATED[r]
         norm_counts = residue_counts / np.sum(residue_counts)
         norm_codon_array += norm_counts
     norm_codon_dict = dict(zip(CODED_CODONS, list(np.log(norm_codon_array))))
