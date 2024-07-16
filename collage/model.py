@@ -3,7 +3,7 @@ import math
 import torch
 import torch.nn as nn
 
-from collage.reference_data import CODON_TO_RESIDUE, CODONS, RESIDUES, INT_TO_RESIDUE
+from collage.reference_data import CODON_MASK_EMBEDDING
 from collage.defaults import HYPERPARAMETERS, TRAINING_PARAMETERS
 
 
@@ -110,10 +110,7 @@ class CollageModel(nn.Module):
                                           dropout,
                                           max_len)
 
-        codon_mask_embedding = [[float(INT_TO_RESIDUE[i] == CODON_TO_RESIDUE[CODONS[j]])
-                                 for j in range(len(CODONS) - 1)]
-                                for i in range(len(RESIDUES))]
-        self.codon_masker = nn.Embedding.from_pretrained(torch.tensor(codon_mask_embedding))
+        self.codon_masker = nn.Embedding.from_pretrained(torch.tensor(CODON_MASK_EMBEDDING))
         self.linear = nn.Linear(embed_dim, n_output_tokens - 1)
         nn.init.constant_(self.linear.bias, -math.log(64.0 - 1))
         self.softmax = nn.LogSoftmax(dim=-1)
@@ -127,7 +124,7 @@ class CollageModel(nn.Module):
         protein: [batch_size, protein_length]
         cds: [batch_size, codons_length]
 
-        return [batch_size, codons_length+1, 65] (64 possible residues + start tag)
+        return [batch_size, codons_length+1, 65] (64 possible residues + special start tag)
         '''
         codon_mask = self.return_codon_mask(protein)
 
