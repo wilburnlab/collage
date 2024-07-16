@@ -6,7 +6,7 @@ import numpy as np
 
 from typing import List
 
-from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
+from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK_DEPRECATED
 
 CODED_CODONS = [CODON_TO_INT[c] for c in CODONS[1:65]]
 
@@ -114,8 +114,8 @@ def calc_codon_weights(sequence_dict: dict,
     codon_array = codon_counts_in_library(sequence_dict)
     if aa_normalize:
         norm_codon_array = np.zeros(codon_array.shape)
-        for r in RESIDUE_TO_CODON_MASK:
-            residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
+        for r in RESIDUE_TO_CODON_MASK_DEPRECATED:
+            residue_counts = codon_array * RESIDUE_TO_CODON_MASK_DEPRECATED[r]
             norm_counts = residue_counts / np.sum(residue_counts)
             norm_codon_array += norm_counts
         # codon_array =
@@ -138,8 +138,8 @@ def codedorf_to_weights(orf_coded: list,
 def calc_null_codon_logL(sequence_dict: dict) -> dict:
     codon_array = codon_counts_in_library(sequence_dict)
     norm_codon_array = np.zeros(codon_array.shape)
-    for r in RESIDUE_TO_CODON_MASK:
-        residue_counts = codon_array * RESIDUE_TO_CODON_MASK[r]
+    for r in RESIDUE_TO_CODON_MASK_DEPRECATED:
+        residue_counts = codon_array * RESIDUE_TO_CODON_MASK_DEPRECATED[r]
         norm_counts = residue_counts / np.sum(residue_counts)
         norm_codon_array += norm_counts
     norm_codon_dict = dict(zip(CODED_CODONS, list(np.log(norm_codon_array))))

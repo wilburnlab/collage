@@ -35,5 +35,7 @@ RESIDUES = ['-',
 RESIDUE_TO_INT = dict(zip(RESIDUES, range(len(RESIDUES))))
 INT_TO_RESIDUE = dict([x[::-1] for x in RESIDUE_TO_INT.items()])
 
-RESIDUE_TO_CODON_MASK = dict([(r, np.asarray([CODON_TO_RESIDUE[c] == r for c in CODONS[1:65]], 'float32'))
-                              for r in RESIDUES[1:]])
+# TODO(auberon): Remove this and fix anything that depends on it
+# It does not use the same codon encoding as the model does.
+RESIDUE_TO_CODON_MASK_DEPRECATED = dict([(r, np.asarray([CODON_TO_RESIDUE[c] == r for c in CODONS[1:65]], 'float32'))
+                                         for r in RESIDUES[1:]])
