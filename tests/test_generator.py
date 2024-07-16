@@ -1,4 +1,20 @@
-from collage.generator import exceeds_gc
+import torch
+
+from collage.generator import exceeds_gc, beam_generator
+
+
+def test_beam_generator_one_residue_protein(mock_collage_model, mock_lls):
+    '''
+    Test that the correct sequences are generated for a sequence that only has a single
+    residue: P.
+    '''
+
+    mock_collage_model.side_effect = [mock_lls['P'].view(1, 1, 65)]
+
+    res = beam_generator(mock_collage_model, 'P', '', gen_size=5, max_seqs=5)
+
+    # The valid sequences should be the valid codons for 'P'
+    assert set(res.keys()) == set(['CCT', 'CCC', 'CCA', 'CCG'])
 
 
 def test_exceeds_gc_not_triggered_on_sequence_with_no_gc():
