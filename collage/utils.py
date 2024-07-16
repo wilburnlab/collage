@@ -4,6 +4,8 @@ import datetime
 import math
 import numpy as np
 
+from typing import List
+
 from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
 
 CODED_CODONS = [CODON_TO_INT[c] for c in CODONS[1:65]]
@@ -62,7 +64,7 @@ def len_check(sequence: str,
 
 
 def orf_to_coded(orf: str,
-                 add_start: bool = False) -> list:
+                 add_start: bool = False) -> List[int]:
     codons = re.findall('...', orf)
     coded = [CODON_TO_INT[c] for c in codons]
     if add_start:
@@ -70,7 +72,7 @@ def orf_to_coded(orf: str,
     return coded
 
 
-def prot_to_coded(prot: str) -> list:
+def prot_to_coded(prot: str) -> List[int]:
     return [RESIDUE_TO_INT[r] for r in prot]
 
 

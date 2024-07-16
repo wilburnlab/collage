@@ -123,6 +123,12 @@ class CollageModel(nn.Module):
         return torch.where(codon_mask != 0, 0.0, -torch.inf)
 
     def forward(self, protein, cds):
+        '''
+        protein: [batch_size, protein_length]
+        cds: [batch_size, codons_length]
+
+        return [batch_size, codons_length+1, 65] (64 possible residues + start tag)
+        '''
         codon_mask = self.return_codon_mask(protein)
 
         x = self.protein_encoder(protein)
