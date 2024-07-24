@@ -36,7 +36,7 @@ def mock_collage_model() -> MagicMock:
 def mock_lls() -> Dict[int, torch.FloatTensor]:
     '''Returns a dictionary of amino acid strings to mock log likelihoods.
 
-    Each value is a tensor of length 66 (64 possible residues + 2 special tags).
+    Each value is a tensor of length 65 (64 possible residues + 1 special tag).
     The corresponding index for each impossible codon will be -inf, and each possible
     codon will have an arbitrary (but consistent) LL.'''
 
@@ -54,6 +54,6 @@ def mock_lls() -> Dict[int, torch.FloatTensor]:
             else:
                 weights.append(float('-inf'))
 
-        mock_data[INT_TO_RESIDUE[residue_int]] = torch.tensor(weights)
+        mock_data[INT_TO_RESIDUE[residue_int]] = weights
 
     return mock_data
