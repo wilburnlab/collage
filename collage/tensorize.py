@@ -19,26 +19,6 @@ def split_train_test_data(processed_data: list,
     return data_by_mode
 
 
-'''
-def records_to_tensors( records: list,
-                        start_idx: int,
-                        end_idx: int,
-                        max_len: int) -> tuple:
-
-    assert end_idx - start_idx <= max_len, 'End index exceeds max length in sequence slice'
-
-    padded_orfs = [ [65] + r['ORF_coded'] + [0]*( max_len - r['Length'] )
-                    for r in records ]
-    orf_tensor = torch.Tensor( padded_orfs ).to( torch.int64 )
-
-    padded_proteins = [ r['Translation'] + [0]*( max_len - r['Length'] ) 
-                        for r in records ]
-    protein_tensor = torch.Tensor( padded_proteins ).to( torch.int64 )
-
-    return ( protein_tensor, orf_tensor)
-'''
-
-
 def record_slice_to_arrays(record: dict,
                            start_idx: int,
                            end_idx: int,

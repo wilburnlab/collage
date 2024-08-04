@@ -14,8 +14,6 @@ def reverse_complement(sequence: str) -> str:
     temp_seq = sequence.upper()
     temp_seq = temp_seq.replace('A', 't').replace(
         'T', 'a').replace('C', 'g').replace('G', 'c')
-    # temp_seq = temp_seq.replace('K','m').replace('M','k').replace('R','y').replace('Y','r')
-    # temp_seq = temp_seq.replace('B','v').replace('V','b').replace('H','d').replace('D','h')
     return temp_seq.upper()[::-1]
 
 
@@ -173,9 +171,6 @@ def library_to_orf_records(sequence_library: dict,
         orf_records = new_records
 
     return orf_records
-
-
-# Draft batch function for prediciton (which is a bit different from training)
 
 
 def library_scorer(model: nn.Module,

@@ -152,8 +152,6 @@ def dna_dictionary_to_records(dna_dict: dict,
     '''
     Process DNA dictionary into a list of dictionaries with processed data
     '''
-
-    codon_weight_dict = calc_codon_weights(dna_dict)
     norm_codon_dict = calc_null_codon_logL(dna_dict)
 
     records = []
@@ -169,46 +167,8 @@ def dna_dictionary_to_records(dna_dict: dict,
             record['Codon_weights'] = codedorf_to_weights(record['ORF_coded'][1:], norm_codon_dict)  # Remove start
             records.append(record)
     return records
-    # df = pd.DataFrame.from_records( records )
-    # return df
 
 
 def timer(start):
     return str(datetime.timedelta(seconds=round(time.time() - start)))
 
-
-# def actg_check( seq ):
-#    return set(seq) == set( ['A','T','C','G'] )
-
-
-'''
-def dna_to_prot_dict( dna_dict, min_aa = 30, max_aa = 2000):
-    prot_dict = { }
-    for seq_name in dna_dict:
-        prot = translate( dna_dict[seq_name] )
-        if orf_check( prot ) and prot_size_check( prot, min_aa, max_aa ):
-            prot_dict[ seq_name ] = prot
-    return prot_dict
-
-
-def seqdict_to_df( dna_dict, min_aa = 30, max_aa = 2000):
-    rows = [ ]
-    for seq_name in dna_dict:
-        prot = translate( dna_dict[seq_name] )
-        if orf_check( prot ) and prot_size_check( prot, min_aa, max_aa ):
-            rows.append( [ seq_name, dna_dict[seq_name], prot, len(prot) ] )
-
-    df = pd.DataFrame( rows, columns=[ 'Ensembl_ID', 'ORF', 'Translation', 'Translation_length', ])
-    return df
-
-def orf_to_coded( orf ):
-    codons = re.findall( '...', orf )
-    coded = [ codon_to_int[c] for c in codons ]
-    return coded
-
-def prot_to_coded( prot ):
-    return [ residue_to_int[r] for r in prot ]
-
-def nt_to_coded( orf ):
-    return [ nt_to_int[n] for n in orf ]
-'''
