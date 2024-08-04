@@ -131,7 +131,6 @@ def seq_scores_to_seq_dict(seq_scores):
 
 
 def seq_scorer(model, cds, gen_size=500):
-
     s_codons = re.findall('...', cds)
     prot = translate(cds)
     prot_len = len(prot)
