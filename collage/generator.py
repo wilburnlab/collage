@@ -27,18 +27,25 @@ import time
 current_species = ['Ecoli_K12']
 
 
-def gc_100_penalty(seq):
+def gc_penalty(seq, mean=0.5, pad=0.05, std=0.05, slice_len=50):
     # Convert the sequence to GC code
     gc = [b in ['C', 'G'] for b in seq]
-    slices = [gc[i: i + 100] for i in range(0, len(gc), 100)]
-    percents = [np.mean(s) for s in slices]
+    slices = [gc[i: i + slice_len] for i in range(0, len(gc), slice_len)]
+    percents = np.array([np.mean(s) for s in slices])
     #exceptions = [p >= 0.65 for p in percents]
     #return np.any(exceptions)
-    penalty = np.square(np.abs(np.max(percents)-0.5)/0.05)
-    return penalty
+
+    
 
 
-def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
+    return np.square(np.max([0.0, np.max(np.abs(percents-mean)-pad)])/std) #np.square(np.max([0.0, np.abs(percents-mean)-pad])/std)
+
+
+    #penalty = np.max(np.square((np.abs(percents-mean)-pad)/std))
+    #return penalty
+
+
+def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100, gc_mean=0.5, gc_pad=0.05, gc_std=0.05):
     assert len(
         pre_sequence) % 3 == 0, 'Start sequence length is not a multiple of 3'
 
@@ -48,6 +55,7 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
     full_prot = translate(pre_sequence) + prot
     full_prot_len = len(full_prot)
 
+    sum_logLs = {pre_sequence: 0.0}
     current_seqs = {pre_sequence: 0.0}
 
     # start_codons = re.findall( '...', start )
@@ -84,7 +92,8 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
         output = model(prot_tensor, orf_tensor)
 
         logLs = output.cpu().detach().numpy()[:, -1, :]
-        candidate_seqs = {}
+        candidate_scores = {}
+        candidate_logLs = {}
         for j, seq in enumerate(current_seqs):
             codon_logL = dict([(c, l) for c, l in zip(
                 CODONS, logLs[j]) if np.isfinite(l)])
@@ -93,13 +102,18 @@ def beam_generator(model, prot, pre_sequence='', gen_size=500, max_seqs=100):
                 #    #print('TRIGGER')
                 #    continue  # Avoid >65% GC
                 new_seq = seq+c
-                candidate_seqs[new_seq] = current_seqs[seq] + codon_logL[c] - gc_100_penalty(new_seq)
+                #print(seq, new_seq)
+                candidate_logLs[new_seq] = sum_logLs[seq] + codon_logL[c] #- gc_100_penalty(new_seq)
+                candidate_scores[new_seq] = candidate_logLs[new_seq] - gc_penalty(new_seq, gc_mean, gc_pad, gc_std)
 
-        candidate_seqs = dict(sorted(candidate_seqs.items(), key=lambda x: x[1], reverse=True))
-        current_seqs = dict(list(candidate_seqs.items())[:max_seqs])
+        #print(candidate_logLs)
+        candidate_scores = dict(sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True))
+        candidate_logLs = dict(sorted(candidate_scores.items(), key=lambda x: candidate_scores[x[0]], reverse=True))
+        sum_logLs = dict(list(candidate_logLs.items())[:max_seqs])
+        current_seqs = dict(list(candidate_scores.items())[:max_seqs])
         #print(len(current_seqs))
 
-    return current_seqs
+    return current_seqs, sum_logLs
 
 
 
