@@ -47,7 +47,7 @@ def validate_seq_dict(seq_dict, override_alphabet: str = None):
         if override_alphabet == 'All':
             return seq_dict
         else:
-            filter = {'DNA':NUCLEOTIDES, 'Protein':Residues}[override_alphabet]
+            filter = {'DNA':NUCLEOTIDES, 'Protein':RESIDUES}[override_alphabet]
             seq_dict = dict([x for x in seq_dict.items() if set(x[1]) <= set(filter)])
             return seq_dict
 
