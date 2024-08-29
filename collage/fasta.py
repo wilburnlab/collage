@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TextIO
 
 from collage.utils import identify_alphabet
-
+from collage.reference_data import NUCLEOTIDES, RESIDUES
 
 class FileContentsError(RuntimeError):
     pass
@@ -14,7 +14,7 @@ class FileContentsError(RuntimeError):
 
 def read_fasta(file_name: str | Path,
                first_word: bool,
-               override_alphabet_check: bool = False) -> dict:
+               override_alphabet: str = None) -> dict:
     '''
     Return dict with keys = names, values = sequences
     '''
@@ -28,27 +28,29 @@ def read_fasta(file_name: str | Path,
     if not seq_dict:
         raise FileContentsError(f'No sequences found in FASTA file: "{file_name}"')
 
-    validate_seq_dict(seq_dict, override_alphabet_check)
+    seq_dict = validate_seq_dict(seq_dict, override_alphabet)
 
     return seq_dict
 
 
-def validate_seq_dict(seq_dict, override_alphabet_check: bool = False):
+def validate_seq_dict(seq_dict, override_alphabet: str = None):
+    assert override_alphabet in [None, 'DNA', 'Protein', 'All'],\
+        'Invalid override_alphabet option'
     # Infer if alphabet is nucleotide or protein
-    if not override_alphabet_check:
+    if override_alphabet is None:
         observed_alphabets = set([identify_alphabet(s)
                                  for s in seq_dict.values()])
-
-        # TODO(auberon): convert these to FileContentsError
         assert 'Unknown' not in observed_alphabets, 'Unknown characters in FASTA file'
         assert len(
             observed_alphabets) == 1, 'Both DNA and Protein sequences in FASTA file'
-        alphabet = list(observed_alphabets)[0]
+    else:
+        if override_alphabet == 'All':
+            return seq_dict
+        else:
+            filter = {'DNA':NUCLEOTIDES, 'Protein':Residues}[override_alphabet]
+            seq_dict = dict([x for x in seq_dict.items() if set(x[1]) <= set(filter)])
+            return seq_dict
 
-    # TODO(auberon): Check with Damien whether this can be
-    # Remove sequences with degenerate nucleotides
-    # if alphabet == 'DNA':
-    #    seq_dict = dict( [ x for x in seq_dict.items() if set( x[1] ) <= set( nucleotides ) ] )
 
 
 def parse_fasta(file_data: TextIO, first_word: bool):
