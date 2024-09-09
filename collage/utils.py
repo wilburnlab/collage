@@ -4,7 +4,7 @@ import datetime
 import math
 import numpy as np
 
-from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, NUCLEOTIDE_TO_INT, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK
+from collage.reference_data import NUCLEOTIDES, RESIDUES, CODONS, CODON_TO_RESIDUE, NUCLEOTIDE_TO_INT, CODON_TO_INT, RESIDUE_TO_INT, RESIDUE_TO_CODON_MASK, MITOCHONDRIAL_CODON_TO_RESIDUE
 
 CODED_CODONS = [CODON_TO_INT[c] for c in CODONS[1:65]]
 
@@ -159,6 +159,35 @@ def dna_dictionary_to_records(dna_dict: dict,
 
 def timer(start):
     return str(datetime.timedelta(seconds=round(time.time() - start)))
+
+def count_stop_codons(sequence: str, translation_scheme: str = 'nuclear') -> int:
+    """
+    Count the number of stop codons in a sequence using a specific translation scheme.
+    
+    Args:
+        sequence (str): The DNA sequence to analyze.
+        translation_scheme (str): Either 'nuclear' or 'mitochondrial' to specify the codon table.
+    
+    Returns:
+        int: The number of stop codons in the sequence.
+    """
+
+    # Choose the appropriate codon-to-residue mapping based on the translation scheme
+    if translation_scheme == 'nuclear':
+        codon_to_residue = CODON_TO_RESIDUE  # Assuming this is the nuclear codon table
+    elif translation_scheme == 'mitochondrial':
+        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE  # Create or import mitochondrial codon table
+    else:
+        raise ValueError("Invalid translation scheme. Choose 'nuclear' or 'mitochondrial'.")
+    
+    # Identify codons
+    dna_sequence = sequence.strip().upper()
+    codons = re.findall('...', dna_sequence)
+    
+    # Count stop codons
+    stop_codons = [codon for codon in codons if codon_to_residue.get(codon) == '.']
+    
+    return len(stop_codons)
 
 
 # def actg_check( seq ):
