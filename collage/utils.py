@@ -25,22 +25,61 @@ def identify_alphabet(sequence: str) -> str:
     else:
         return 'Unknown'
 
+def choose_translation_scheme(nuclear_stop_codons: int, mitochondrial_stop_codons: int) -> str:
+    """
+    Choose the translation scheme (nuclear or mitochondrial) based on the number of stop codons.
+    
+    Args:
+        nuclear_stop_codons (int): Number of stop codons in the nuclear translation scheme.
+        mitochondrial_stop_codons (int): Number of stop codons in the mitochondrial translation scheme.
+    
+    Returns:
+        str: 'nuclear' if nuclear translation has fewer stop codons, otherwise 'mitochondrial'.
+    """
+    if nuclear_stop_codons < mitochondrial_stop_codons:
+        return 'nuclear'
+    else:
+        return 'mitochondrial'
 
-def translate(sequence: str) -> str:
+def translate(sequence: str, translation_scheme: str = 'nuclear') -> str:
     '''
-    Translate DNA sequence to protein
+    Translate DNA sequence to protein using the specified translation scheme (nuclear or mitochondrial).
+    
+    Args:
+        sequence (str): The DNA sequence to translate.
+        translation_scheme (str): Either 'nuclear' or 'mitochondrial' to specify the codon table.
+    
+    Returns:
+        str: The translated protein sequence with the terminal stop codon removed if it exists.
     '''
 
+    # Ensure the sequence is DNA
     observed_alphabet = identify_alphabet(sequence)
     assert observed_alphabet == 'DNA', 'Attempted to translate non-DNA sequence: ' + sequence
 
+    # Choose the appropriate codon-to-residue mapping
+    if translation_scheme == 'nuclear':
+        codon_to_residue = CODON_TO_RESIDUE
+    elif translation_scheme == 'mitochondrial':
+        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE
+    else:
+        raise ValueError("Invalid translation scheme. Choose 'nuclear' or 'mitochondrial'.")
+
+    # Translate the sequence
     dna_sequence = sequence.strip().upper()
     if len(dna_sequence) < 3:
-        return ''
+        return ''  # Return empty string for sequences shorter than 3 nucleotides
 
-    obs_codons = re.findall('...', dna_sequence)
-    obs_residues = [CODON_TO_RESIDUE.get(c, 'X') for c in obs_codons]
-    return ''.join(obs_residues)
+    obs_codons = re.findall('...', dna_sequence)  # Find codons
+    obs_residues = [codon_to_residue.get(c, 'X') for c in obs_codons]  # Translate codons to residues
+    
+    protein_seq = ''.join(obs_residues)
+
+    # Strip terminal stop codon (period) if it exists at the end of the sequence
+    #if protein_seq.endswith('.'):
+        #protein_seq = protein_seq[:-1]
+
+    return protein_seq
 
 
 def orf_check(prot: str) -> bool:
