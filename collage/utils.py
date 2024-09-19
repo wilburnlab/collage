@@ -41,29 +41,71 @@ def choose_translation_scheme(nuclear_stop_codons: int, mitochondrial_stop_codon
     else:
         return 'mitochondrial'
 
-def translate(sequence: str, translation_scheme: str = 'nuclear') -> str:
-    '''
-    Translate DNA sequence to protein using the specified translation scheme (nuclear or mitochondrial).
+def count_stop_codons(sequence: str, translation_scheme: str = 'nuclear') -> int:
+    """
+    Count the number of stop codons in a sequence using a specific translation scheme.
     
     Args:
-        sequence (str): The DNA sequence to translate.
+        sequence (str): The DNA sequence to analyze.
         translation_scheme (str): Either 'nuclear' or 'mitochondrial' to specify the codon table.
     
     Returns:
+        int: The number of stop codons in the sequence.
+    """
+
+    # Choose the appropriate codon-to-residue mapping based on the translation scheme
+    if translation_scheme == 'nuclear':
+        codon_to_residue = CODON_TO_RESIDUE  # Assuming this is the nuclear codon table
+    elif translation_scheme == 'mitochondrial':
+        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE  # Create or import mitochondrial codon table
+    else:
+        raise ValueError("Invalid translation scheme. Choose 'nuclear' or 'mitochondrial'.")
+    
+    # Identify codons
+    dna_sequence = sequence.strip().upper()
+    codons = re.findall('...', dna_sequence)
+    
+    # Count stop codons
+    stop_codons = [codon for codon in codons if codon_to_residue.get(codon) == '.']
+    
+    return len(stop_codons)
+
+def translate(sequence: str) -> str:
+    """
+    Dynamically translate DNA sequence to protein, automatically choosing the translation scheme
+    that yields fewer stop codons.
+
+    Args:
+        sequence (str): The DNA sequence to translate.
+
+    Returns:
         str: The translated protein sequence with the terminal stop codon removed if it exists.
-    '''
+    """
 
     # Ensure the sequence is DNA
     observed_alphabet = identify_alphabet(sequence)
     assert observed_alphabet == 'DNA', 'Attempted to translate non-DNA sequence: ' + sequence
 
-    # Choose the appropriate codon-to-residue mapping
+    # Translate using both schemes and count stop codons
+    nuclear_stop_codons = count_stop_codons(sequence, translation_scheme='nuclear')
+    mitochondrial_stop_codons = count_stop_codons(sequence, translation_scheme='mitochondrial')
+
+    # Handling exceptions:
+    # 1. If there are no stop codons, translate with nuclear by default.
+    if nuclear_stop_codons == 0 and mitochondrial_stop_codons == 0:
+        translation_scheme = 'nuclear'
+    # 2. If the number of stop codons is equal, assume nuclear translation.
+    elif nuclear_stop_codons == mitochondrial_stop_codons:
+        translation_scheme = 'nuclear'
+    # 3. Otherwise, choose the scheme with fewer stop codons.
+    else:
+        translation_scheme = 'nuclear' if nuclear_stop_codons < mitochondrial_stop_codons else 'mitochondrial'
+
+    # Perform translation using the chosen scheme
     if translation_scheme == 'nuclear':
         codon_to_residue = CODON_TO_RESIDUE
-    elif translation_scheme == 'mitochondrial':
-        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE
     else:
-        raise ValueError("Invalid translation scheme. Choose 'nuclear' or 'mitochondrial'.")
+        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE
 
     # Translate the sequence
     dna_sequence = sequence.strip().upper()
@@ -72,14 +114,11 @@ def translate(sequence: str, translation_scheme: str = 'nuclear') -> str:
 
     obs_codons = re.findall('...', dna_sequence)  # Find codons
     obs_residues = [codon_to_residue.get(c, 'X') for c in obs_codons]  # Translate codons to residues
-    
+
     protein_seq = ''.join(obs_residues)
 
-    # Strip terminal stop codon (period) if it exists at the end of the sequence
-    #if protein_seq.endswith('.'):
-        #protein_seq = protein_seq[:-1]
-
     return protein_seq
+
 
 
 def orf_check(prot: str) -> bool:
@@ -198,36 +237,6 @@ def dna_dictionary_to_records(dna_dict: dict,
 
 def timer(start):
     return str(datetime.timedelta(seconds=round(time.time() - start)))
-
-def count_stop_codons(sequence: str, translation_scheme: str = 'nuclear') -> int:
-    """
-    Count the number of stop codons in a sequence using a specific translation scheme.
-    
-    Args:
-        sequence (str): The DNA sequence to analyze.
-        translation_scheme (str): Either 'nuclear' or 'mitochondrial' to specify the codon table.
-    
-    Returns:
-        int: The number of stop codons in the sequence.
-    """
-
-    # Choose the appropriate codon-to-residue mapping based on the translation scheme
-    if translation_scheme == 'nuclear':
-        codon_to_residue = CODON_TO_RESIDUE  # Assuming this is the nuclear codon table
-    elif translation_scheme == 'mitochondrial':
-        codon_to_residue = MITOCHONDRIAL_CODON_TO_RESIDUE  # Create or import mitochondrial codon table
-    else:
-        raise ValueError("Invalid translation scheme. Choose 'nuclear' or 'mitochondrial'.")
-    
-    # Identify codons
-    dna_sequence = sequence.strip().upper()
-    codons = re.findall('...', dna_sequence)
-    
-    # Count stop codons
-    stop_codons = [codon for codon in codons if codon_to_residue.get(codon) == '.']
-    
-    return len(stop_codons)
-
 
 # def actg_check( seq ):
 #    return set(seq) == set( ['A','T','C','G'] )
